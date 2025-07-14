@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Logic Flow Diagrams</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .diagram-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .step-number {
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex: 1;
+        }
+        .step-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .step-description {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .arrow {
+            text-align: center;
+            font-size: 24px;
+            color: #3498db;
+            margin: 10px 0;
+        }
+        .database-structure {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .db-table {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .db-table-name {
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+        .db-field {
+            margin: 5px 0;
+            padding: 3px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .field-name {
+            color: #2980b9;
+            font-weight: bold;
+        }
+        .field-type {
+            color: #27ae60;
+        }
+        .admin-workflow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .workflow-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .workflow-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .workflow-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .rag-pipeline {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .pipeline-stage {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        .pipeline-stage:nth-child(even) {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .pipeline-stage:nth-child(3n) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .stage-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+        .stage-content {
+            flex: 1;
+        }
+        .stage-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .code-example {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .maintenance-cycle {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .cycle-item {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            min-width: 150px;
+        }
+        .cycle-title {
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        .cycle-tasks {
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Chatbot Logic Flow & Architecture</h1>
+        
+        <!-- RAG Pipeline Flow -->
+        <div class="diagram-section">
+            <h2>1. RAG (Retrieval-Augmented Generation) Pipeline</h2>
+            <div class="rag-pipeline">
+                <div class="pipeline-stage">
+                    <div class="stage-icon">💬</div>
+                    <div class="stage-content">
+                        <div class="stage-title">User Input</div>
+                        <div>User sends message: "I have a headache and fever"</div>
+                    </div>
+                </div>
+                
+                <div class="pipeline-stage">
+                    <div class="stage-icon">🔍</div>
+                    <div class="stage-content">
+                        <div class="stage-title">Knowledge Search</div>
+                        <div>System searches knowledge base for "headache" and "fever" keywords</div>
+                    </div>
+                </div>
+                
+                <div class="pipeline-stage">
+                    <div class="stage-icon">📚</div>
+                    <div class="stage-content">
+                        <div class="stage-title">Context Retrieval</div>
+                        <div>Finds relevant medical information about symptoms and conditions</div>
+                    </div>
+                </div>
+                
+                <div class="pipeline-stage">
+                    <div class="stage-icon">🧠</div>
+                    <div class="stage-content">
+                        <div class="stage-title">LLM Processing</div>
+                        <div>Sends context + user query to OpenAI/Claude API</div>
+                    </div>
+                </div>
+                
+                <div class="pipeline-stage">
+                    <div class="stage-icon">💡</div>
+                    <div class="stage-content">
+                        <div class="stage-title">Response Generation</div>
+                        <div>LLM generates response based on your knowledge base</div>
+                    </div>
+                </div>
+                
+                <div class="pipeline-stage">
+                    <div class="stage-icon">✅</div>
+                    <div class="stage-content">
+                        <div class="stage-title">Response Delivery</div>
+                        <div>System adds disclaimers and sends response to user</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overall System Architecture -->
+        <div class="diagram-section">
+            <h2>2. Overall System Architecture Flow</h2>
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">User Interface</div>
+                        <div class="step-description">React/Next.js chat interface where users interact</div>
+                    </div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">API Gateway</div>
+                        <div class="step-description">Next.js API routes handle requests, authentication, and routing</div>
+                    </div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Chat Engine</div>
+                        <div class="step-description">Core logic for message processing and conversation management</div>
+                    </div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Knowledge Retrieval</div>
+                        <div class="step-description">Search PostgreSQL database or vector store for relevant information</div>
+                    </div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="flow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">LLM Integration</div>
+                        <div class="step-description">Send context + query to OpenAI/Claude API</div>
+                    </div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="flow-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <div class="step-title">Response Processing</div>
+                        <div class="step-description">Add medical disclaimers, save to chat history, return to user</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Database Structure -->
+        <div class="diagram-section">
+            <h2>3. Database Structure & Relationships</h2>
+            <div class="database-structure">
+                <div class="db-table">
+                    <div class="db-table-name">knowledge_entries</div>
+                    <div class="db-field"><span class="field-name">id</span>: <span class="field-type">SERIAL PRIMARY KEY</span></div>
+                    <div class="db-field"><span class="field-name">title</span>: <span class="field-type">VARCHAR(255)</span></div>
+                    <div class="db-field"><span class="field-name">content</span>: <span class="field-type">TEXT</span></div>
+                    <div class="db-field"><span class="field-name">category</span>: <span class="field-type">VARCHAR(100)</span></div>
+                    <div class="db-field"><span class="field-name">keywords</span>: <span class="field-type">TEXT[]</span></div>
+                    <div class="db-field"><span class="field-name">confidence_level</span>: <span class="field-type">VARCHAR(20)</span></div>
+                    <div class="db-field"><span class="field-name">medical_reviewed</span>: <span class="field-type">BOOLEAN</span></div>
+                    <div class="db-field"><span class="field-name">created_at</span>: <span class="field-type">TIMESTAMP</span></div>
+                </div>
+                
+                <div class="db-table">
+                    <div class="db-table-name">chat_sessions</div>
+                    <div class="db-field"><span class="field-name">id</span>: <span class="field-type">SERIAL PRIMARY KEY</span></div>
+                    <div class="db-field"><span class="field-name">user_id</span>: <span class="field-type">VARCHAR(100)</span></div>
+                    <div class="db-field"><span class="field-name">started_at</span>: <span class="field-type">TIMESTAMP</span></div>
+                    <div class="db-field"><span class="field-name">context</span>: <span class="field-type">JSONB</span></div>
+                    <div class="db-field"><span class="field-name">status</span>: <span class="field-type">VARCHAR(20)</span></div>
+                </div>
+                
+                <div class="db-table">
+                    <div class="db-table-name">chat_messages</div>
+                    <div class="db-field"><span class="field-name">id</span>: <span class="field-type">SERIAL PRIMARY KEY</span></div>
+                    <div class="db-field"><span class="field-name">session_id</span>: <span class="field-type">INTEGER REFERENCES chat_sessions(id)</span></div>
+                    <div class="db-field"><span class="field-name">sender_type</span>: <span class="field-type">VARCHAR(10)</span> -- 'user' or 'bot'</div>
+                    <div class="db-field"><span class="field-name">content</span>: <span class="field-type">TEXT</span></div>
+                    <div class="db-field"><span class="field-name">timestamp</span>: <span class="field-type">TIMESTAMP</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Workflow -->
+        <div class="diagram-section">
+            <h2>4. Admin Knowledge Management Workflow</h2>
+            <div class="admin-workflow">
+                <div class="workflow-card">
+                    <div class="workflow-icon">📝</div>
+                    <div class="workflow-title">Create Content</div>
+                    <div>Admin adds new medical information via dashboard</div>
+                </div>
+                
+                <div class="workflow-card">
+                    <div class="workflow-icon">👨‍⚕️</div>
+                    <div class="workflow-title">Medical Review</div>
+                    <div>Healthcare professional reviews and approves content</div>
+                </div>
+                
+                <div class="workflow-card">
+                    <div class="workflow-icon">🔄</div>
+                    <div class="workflow-title">Version Control</div>
+                    <div>System tracks changes and maintains version history</div>
+                </div>
+                
+                <div class="workflow-card">
+                    <div class="workflow-icon">🚀</div>
+                    <div class="workflow-title">Deploy Live</div>
+                    <div>Approved content becomes available to chatbot</div>
+                </div>
+                
+                <div class="workflow-card">
+                    <div class="workflow-icon">📊</div>
+                    <div class="workflow-title">Monitor Usage</div>
+                    <div>Analytics show how content performs in conversations</div>
+                </div>
+                
+                <div class="workflow-card">
+                    <div class="workflow-icon">🔧</div>
+                    <div class="workflow-title">Iterate & Improve</div>
+                    <div>Update content based on user feedback and gaps</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Context Management -->
+        <div class="diagram-section">
+            <h2>5. Context Management Flow</h2>
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">New Session</div>
+                        <div class="step-description">User starts conversation, system creates session_id</div>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Store Context</div>
+                        <div class="step-description">Each message updates conversation context (symptoms, preferences)</div>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Context Retrieval</div>
+                        <div class="step-description">Before responding, system loads recent conversation history</div>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Contextual Response</div>
+                        <div class="step-description">LLM generates response using both knowledge base and conversation context</div>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">Session Persistence</div>
+                        <div class="step-description">Context saved for future conversations (user can resume later)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Cycle -->
+        <div class="diagram-section">
+            <h2>6. Maintenance & Improvement Cycle</h2>
+            <div class="maintenance-cycle">
+                <div class="cycle-item">
+                    <div class="cycle-title">Daily</div>
+                    <div class="cycle-tasks">
+                        • Review failed queries<br>
+                        • Add missing knowledge<br>
+                        • Monitor chat quality
+                    </div>
+                </div>
+                
+                <div class="cycle-item">
+                    <div class="cycle-title">Weekly</div>
+                    <div class="cycle-tasks">
+                        • Analyze chat patterns<br>
+                        • Update knowledge gaps<br>
+                        • Performance optimization
+                    </div>
+                </div>
+                
+                <div class="cycle-item">
+                    <div class="cycle-title">Monthly</div>
+                    <div class="cycle-tasks">
+                        • Full knowledge audit<br>
+                        • Medical review cycle<br>
+                        • System improvements
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Example -->
+        <div class="diagram-section">
+            <h2>7. Sample Implementation Flow</h2>
+            <div class="code-example">
+// Main chat handler function
+async function handleChatMessage(sessionId, userMessage) {
+    // 1. Load conversation context
+    const context = await getSessionContext(sessionId);
+    
+    // 2. Search knowledge base
+    const relevantKnowledge = await searchKnowledge(userMessage);
+    
+    // 3. Build prompt with context + knowledge
+    const prompt = buildPrompt(context, relevantKnowledge, userMessage);
+    
+    // 4. Get LLM response
+    const response = await callLLM(prompt);
+    
+    // 5. Save message history
+    await saveMessage(sessionId, userMessage, response);
+    
+    // 6. Update context
+    await updateContext(sessionId, userMessage, response);
+    
+    return response;
+}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
