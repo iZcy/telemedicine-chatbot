@@ -125,7 +125,7 @@ export default function ChatInterface() {
       </div>
 
       {/* Input */}
-      <form onSubmit={sendMessage} className="p-4 border-t">
+      <form onSubmit={sendMessage} className="p-4 border-t text-gray-900">
         <div className="flex space-x-2">
           <input
             type="text"
