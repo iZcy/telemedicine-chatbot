@@ -1,31 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { generateChatResponse, extractSymptoms } from "@/lib/openai";
-import { searchKnowledge, logKnowledgeGap } from "@/lib/knowledge-search";
+// server/routes/chat.ts
+import { Router } from "express";
+import { prisma } from "../lib/prisma";
+import { generateChatResponse, extractSymptoms } from "../lib/openai.js";
+import { searchKnowledge, logKnowledgeGap } from "../lib/knowledge-search.js";
 
-export async function POST(request: NextRequest) {
+export const chatRouter = Router();
+
+chatRouter.post("/", async (req, res) => {
   try {
-    const { message, sessionId } = await request.json();
+    const { message, sessionId } = req.body;
 
     if (!message || !sessionId) {
-      return NextResponse.json(
-        { error: "Message and sessionId are required" },
-        { status: 400 }
-      );
+      return res
+        .status(400)
+        .json({ error: "Message and sessionId are required" });
     }
 
     if (!message?.trim()) {
-      return NextResponse.json(
-        { error: "Message cannot be empty" },
-        { status: 400 }
-      );
+      return res.status(400).json({ error: "Message cannot be empty" });
     }
 
     if (message.length > 1000) {
-      return NextResponse.json(
-        { error: "Message too long. Please limit to 1000 characters." },
-        { status: 400 }
-      );
+      return res
+        .status(400)
+        .json({ error: "Message too long. Please limit to 1000 characters." });
     }
 
     // Get or create chat session
@@ -110,9 +108,7 @@ export async function POST(request: NextRequest) {
     // Update session context
     await prisma.chatSession.update({
       where: { id: session.id },
-      data: {
-        context: chatContext
-      }
+      data: { context: chatContext }
     });
 
     // Log knowledge matches
@@ -122,23 +118,20 @@ export async function POST(request: NextRequest) {
           sessionId: session.id,
           query: message,
           entryId: result.id,
-          confidence: 0.8 // You can implement proper scoring later
+          confidence: 0.8
         }
       });
     }
 
-    return NextResponse.json({
+    res.json({
       response: botResponse,
       sessionId: session.id,
       context: chatContext
     });
   } catch (error) {
     console.error("Chat API error:", error);
-    return NextResponse.json(
-      {
-        error: "I'm having trouble processing your request. Please try again."
-      },
-      { status: 500 }
-    );
+    res.status(500).json({
+      error: "I'm having trouble processing your request. Please try again."
+    });
   }
-}
+});
