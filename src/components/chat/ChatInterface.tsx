@@ -1,5 +1,4 @@
-'use client';
-
+// src/components/chat/ChatInterface.tsx
 import { useState, useEffect, useRef } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 
@@ -104,8 +103,8 @@ export default function ChatInterface() {
           >
             <div
               className={`max-w-[80%] p-3 rounded-lg ${message.sender === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-900'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-900'
                 }`}
             >
               <p className="text-sm">{message.content}</p>
