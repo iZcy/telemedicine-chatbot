@@ -1,6 +1,7 @@
 // src/components/admin/KnowledgeManager.tsx
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface KnowledgeEntry {
   id: string;
@@ -13,6 +14,17 @@ interface KnowledgeEntry {
 }
 
 export default function KnowledgeManager() {
+  const { logout } = useAuth(); // Add this hook
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // User will be redirected automatically due to auth state change
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   const [entries, setEntries] = useState<KnowledgeEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -111,13 +123,29 @@ export default function KnowledgeManager() {
     <div className="p-6 text-gray-900">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Knowledge Base Management</h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add Entry</span>
-        </button>
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Entry</span>
+          </button>
+          {/* Back Button */}
+          <button
+            onClick={() => window.history.back()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Back
+          </button>
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
       {/* Filters */}

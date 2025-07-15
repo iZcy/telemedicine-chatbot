@@ -1,15 +1,37 @@
 // src/pages/admin/AdminDashboard.tsx
 import { Link } from 'react-router-dom';
-import { Database, MessageSquare, BarChart3, Settings, Bot } from 'lucide-react';
+import { Database, MessageSquare, BarChart3, Settings, Bot, LogOut } from 'lucide-react';
 import AIServiceStatus from '@/components/admin/AIServiceStatus';
+import { useAuth } from '@/contexts/AuthContext'; // Add this import
 
 export default function AdminDashboard() {
+  const { logout } = useAuth(); // Add this hook
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // User will be redirected automatically due to auth state change
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage your telemedicine chatbot system</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+            <p className="text-gray-600">Manage your telemedicine chatbot system</p>
+          </div>
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </button>
         </div>
 
         {/* AI Service Status */}

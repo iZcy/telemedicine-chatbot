@@ -5,6 +5,7 @@ import ChatPage from './pages/ChatPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import KnowledgePage from './pages/admin/KnowledgePage';
 import AnalyticsPage from './pages/admin/AnalyticsPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   return (
@@ -12,9 +13,30 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/chat" element={<ChatPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/knowledge" element={<KnowledgePage />} />
-        <Route path="/admin/analytics" element={<AnalyticsPage />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requireAdmin>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/knowledge"
+          element={
+            <ProtectedRoute requireAdmin>
+              <KnowledgePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/analytics"
+          element={
+            <ProtectedRoute requireAdmin>
+              <AnalyticsPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );

@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import { chatRouter } from "./routes/chat";
 import { knowledgeRouter } from "./routes/knowledge";
 import { healthRouter } from "./routes/health";
+import { authRouter } from "./routes/auth";
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use("/api/auth", authRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/knowledge", knowledgeRouter);
 app.use("/health", healthRouter);
@@ -52,6 +54,7 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     status: "running",
     endpoints: {
+      auth: "/api/auth",
       chat: "/api/chat",
       knowledge: "/api/knowledge",
       health: "/health",
@@ -88,6 +91,7 @@ app.use("*", (req, res) => {
     error: "Endpoint not found",
     timestamp: new Date().toISOString(),
     available_endpoints: {
+      auth: "/api/auth",
       chat: "/api/chat",
       knowledge: "/api/knowledge",
       health: "/health",
@@ -100,6 +104,7 @@ app.use("*", (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`🔐 JWT Secret configured: ${!!process.env.JWT_SECRET}`);
   console.log(`🤖 OpenAI configured: ${!!process.env.OPENAI_API_KEY}`);
   console.log(
     `🔄 DeepSeek fallback configured: ${!!process.env.DEEPSEEK_API_KEY}`
