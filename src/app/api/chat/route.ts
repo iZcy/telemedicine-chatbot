@@ -14,6 +14,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!message?.trim()) {
+      return NextResponse.json(
+        { error: "Message cannot be empty" },
+        { status: 400 }
+      );
+    }
+
+    if (message.length > 1000) {
+      return NextResponse.json(
+        { error: "Message too long. Please limit to 1000 characters." },
+        { status: 400 }
+      );
+    }
+
     // Get or create chat session
     let session = await prisma.chatSession.findUnique({
       where: { id: sessionId },
@@ -121,7 +135,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Chat API error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "I'm having trouble processing your request. Please try again."
+      },
       { status: 500 }
     );
   }
