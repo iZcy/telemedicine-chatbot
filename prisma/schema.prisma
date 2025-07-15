@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(USER)
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  chatSessions ChatSession[]
+
+  @@map("users")
+}
+
+model KnowledgeEntry {
+  id               String             @id @default(cuid())
+  title            String
+  content          String
+  category         String
+  keywords         String[]
+  tags             String[]
+  confidenceLevel  ConfidenceLevel    @default(MEDIUM)
+  medicalReviewed  Boolean            @default(false)
+  requiresEscalation Boolean          @default(false)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  createdBy        String
+  
+  // Relations
+  versions         KnowledgeVersion[]
+  queryMatches     QueryMatch[]
+
+  @@map("knowledge_entries")
+}
+
+model KnowledgeVersion {
+  id          String         @id @default(cuid())
+  entryId     String
+  content     String
+  version     Int
+  createdAt   DateTime       @default(now())
+  createdBy   String
+
+  // Relations
+  entry       KnowledgeEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@map("knowledge_versions")
+}
+
+model ChatSession {
+  id        String   @id @default(cuid())
+  userId    String?
+  startedAt DateTime @default(now())
+  endedAt   DateTime?
+  status    SessionStatus @default(ACTIVE)
+  context   Json     @default("{}")
+
+  // Relations
+  user      User?        @relation(fields: [userId], references: [id])
+  messages  ChatMessage[]
+
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id           String      @id @default(cuid())
+  sessionId    String
+  senderType   SenderType
+  content      String
+  timestamp    DateTime    @default(now())
+  intentDetected String?
+  confidence   Float?
+
+  // Relations
+  session      ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
+
+model QueryMatch {
+  id            String         @id @default(cuid())
+  sessionId     String
+  query         String
+  entryId       String
+  confidence    Float
+  wasHelpful    Boolean?
+  createdAt     DateTime       @default(now())
+
+  // Relations
+  entry         KnowledgeEntry @relation(fields: [entryId], references: [id])
+
+  @@map("query_matches")
+}
+
+model KnowledgeGap {
+  id        String   @id @default(cuid())
+  query     String
+  frequency Int      @default(1)
+  needsContent Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("knowledge_gaps")
+}
+
+enum Role {
+  USER
+  ADMIN
+  MEDICAL_REVIEWER
+}
+
+enum ConfidenceLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum SessionStatus {
+  ACTIVE
+  ENDED
+  ESCALATED
+}
+
+enum SenderType {
+  USER
+  BOT
+}
