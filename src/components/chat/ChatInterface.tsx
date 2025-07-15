@@ -1,6 +1,8 @@
 // src/components/chat/ChatInterface.tsx
 import { useState, useEffect, useRef } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import { Send } from 'lucide-react';
+import WaitingIndicator from './WaitingIndicator';
+import MessageBubble from './MessageBubble';
 
 interface Message {
   id: string;
@@ -13,6 +15,7 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [aiProvider, setAiProvider] = useState<'openai' | 'deepseek'>('openai');
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -20,7 +23,7 @@ export default function ChatInterface() {
     // Welcome message
     setMessages([{
       id: '1',
-      content: "Hello! I'm here to help you with your health questions. Please remember that I provide general information only and you should consult with healthcare professionals for medical advice. How can I assist you today?",
+      content: "Hello! I'm here to help you with your health questions.\n\nPlease remember that I provide general information only and you should consult with healthcare professionals for medical advice.\n\nHow can I assist you today?",
       sender: 'bot',
       timestamp: new Date()
     }]);
@@ -28,7 +31,7 @@ export default function ChatInterface() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -55,7 +58,8 @@ export default function ChatInterface() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: inputMessage,
-          sessionId
+          sessionId,
+          provider: aiProvider
         })
       });
 
@@ -90,48 +94,66 @@ export default function ChatInterface() {
     <div className="flex flex-col h-full max-h-[600px] bg-white rounded-lg shadow-lg">
       {/* Header */}
       <div className="bg-blue-600 text-white p-4 rounded-t-lg">
-        <h2 className="text-lg font-semibold">Medical Assistant</h2>
-        <p className="text-sm opacity-90">Ask me about your health concerns</p>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-lg font-semibold">Medical Assistant</h2>
+
+          {/* AI Provider Toggle */}
+          <div className="flex items-center gap-2 bg-blue-700 rounded-lg p-1">
+            <button
+              onClick={() => setAiProvider('openai')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${aiProvider === 'openai'
+                ? 'bg-white text-blue-600'
+                : 'text-blue-200 hover:text-white'
+                }`}
+              disabled={isLoading}
+            >
+              🧠 OpenAI
+            </button>
+            <button
+              onClick={() => setAiProvider('deepseek')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${aiProvider === 'deepseek'
+                ? 'bg-white text-blue-600'
+                : 'text-blue-200 hover:text-white'
+                }`}
+              disabled={isLoading}
+            >
+              🔮 DeepSeek
+            </button>
+          </div>
+        </div>
+        <p className="text-sm opacity-90">
+          Ask me about your health concerns • Powered by {aiProvider === 'openai' ? 'OpenAI' : 'DeepSeek'}
+        </p>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
-          <div
+          <MessageBubble
             key={message.id}
-            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[80%] p-3 rounded-lg ${message.sender === 'user'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-900'
-                }`}
-            >
-              <p className="text-sm">{message.content}</p>
-              <p className="text-xs opacity-70 mt-1">
-                {message.timestamp.toLocaleTimeString()}
-              </p>
-            </div>
-          </div>
+            content={message.content}
+            sender={message.sender}
+            timestamp={message.timestamp}
+          />
         ))}
+
+        {/* Waiting Indicator */}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 text-gray-900 p-3 rounded-lg">
-              <Loader2 className="h-4 w-4 animate-spin" />
-            </div>
+            <WaitingIndicator provider={aiProvider} />
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
-      <form onSubmit={sendMessage} className="p-4 border-t text-gray-900">
+      <form onSubmit={sendMessage} className="p-4 border-t">
         <div className="flex space-x-2">
           <input
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Type your message..."
+            placeholder={`Ask ${aiProvider === 'openai' ? 'OpenAI' : 'DeepSeek'} about your health...`}
             className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
             disabled={isLoading}
           />
@@ -142,6 +164,18 @@ export default function ChatInterface() {
           >
             <Send className="h-4 w-4" />
           </button>
+        </div>
+
+        {/* Status indicator */}
+        <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+          <span>
+            Using {aiProvider === 'openai' ? '🧠 OpenAI GPT-4' : '🔮 DeepSeek R1'}
+          </span>
+          {isLoading && (
+            <span className="text-blue-600">
+              {aiProvider === 'openai' ? 'OpenAI is thinking...' : 'DeepSeek is processing...'}
+            </span>
+          )}
         </div>
       </form>
     </div>

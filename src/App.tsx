@@ -8,7 +8,7 @@ import AnalyticsPage from './pages/admin/AnalyticsPage';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col text-gray-900">
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/chat" element={<ChatPage />} />

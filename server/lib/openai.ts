@@ -1,9 +1,5 @@
 // server/lib/openai.ts
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+import { aiServiceManager } from "./ai-service-manager";
 
 export async function generateChatResponse(
   userMessage: string,
@@ -20,6 +16,7 @@ IMPORTANT GUIDELINES:
 - Never provide definitive diagnoses
 - Be empathetic and helpful
 - If symptoms seem serious, recommend immediate medical attention
+- Respond in plain text without markdown formatting for better compatibility
 
 KNOWLEDGE BASE:
 ${knowledgeContext}
@@ -37,47 +34,47 @@ Remember to:
 3. Be conversational and empathetic
 4. Suggest escalation if symptoms are concerning`;
 
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage }
-      ],
-      temperature: 0.7,
-      max_tokens: 500
-    });
+  const messages = [
+    { role: "system" as const, content: systemPrompt },
+    { role: "user" as const, content: userMessage }
+  ];
 
-    return (
-      completion.choices[0].message.content ||
-      "I'm sorry, I couldn't generate a response. Please try again."
-    );
-  } catch (error) {
-    console.error("OpenAI API error:", error);
-    return "I'm experiencing technical difficulties. Please try again later or contact support if the issue persists.";
+  const result = await aiServiceManager.generateResponse(messages, {
+    temperature: 0.7,
+    maxTokens: 500
+  });
+
+  // Log which provider was used for monitoring
+  console.log(`Chat response generated using: ${result.provider}`);
+  if (result.error) {
+    console.error("AI Service errors:", result.error);
   }
+
+  return result.response;
 }
 
 export async function extractSymptoms(userMessage: string): Promise<string[]> {
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content:
-            'Extract medical symptoms from the user\'s message. Return only a JSON array of symptoms, no other text. Example: ["headache", "fever", "nausea"]'
-        },
-        { role: "user", content: userMessage }
-      ],
-      temperature: 0.1,
-      max_tokens: 100
-    });
+  const messages = [
+    {
+      role: "system" as const,
+      content:
+        'Extract medical symptoms from the user\'s message. Return only a JSON array of symptoms, no other text. Example: ["headache", "fever", "nausea"]'
+    },
+    { role: "user" as const, content: userMessage }
+  ];
 
-    const response = completion.choices[0].message.content || "[]";
-    return JSON.parse(response);
-  } catch (error) {
-    console.error("Symptom extraction error:", error);
+  const result = await aiServiceManager.generateResponse(messages, {
+    temperature: 0.1,
+    maxTokens: 100
+  });
+
+  try {
+    const symptoms = JSON.parse(result.response);
+    console.log(`Symptoms extracted using: ${result.provider}`);
+    return Array.isArray(symptoms) ? symptoms : [];
+  } catch (parseError) {
+    console.error("Failed to parse symptoms JSON:", parseError);
+    console.error("Raw response:", result.response);
     return [];
   }
 }
