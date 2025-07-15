@@ -19,6 +19,7 @@
     "bcryptjs": "^2.4.3",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
+    "dotenv": "^17.2.0",
     "ioredis": "^5.6.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.263.1",
