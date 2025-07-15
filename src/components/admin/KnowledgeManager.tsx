@@ -108,7 +108,7 @@ export default function KnowledgeManager() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 text-gray-900">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Knowledge Base Management</h1>
         <button
@@ -258,7 +258,9 @@ export default function KnowledgeManager() {
             </div>
 
             <div className="flex items-center space-x-4 mb-2">
-              <span className="bg-gray-100 px-2 py-1 rounded text-sm">{entry.category}</span>
+              <span className="bg-gray-100 px-2 py-1 rounded text-sm">
+                {entry.category.charAt(0).toUpperCase() + entry.category.slice(1)}
+              </span>
               {entry.medicalReviewed && (
                 <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
                   ✓ Medical Reviewed
