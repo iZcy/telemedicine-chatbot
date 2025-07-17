@@ -556,22 +556,22 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
     }
 
     try {
-      // Format the phone number properly
-      const formattedNumber = this.formatPhoneNumber(phoneNumber);
+      // // Format the phone number properly
+      // const selfFormattedNumber = this.formatPhoneNumber(phoneNumber);
 
-      // Validate the number exists on WhatsApp
-      const numberId = await this.client.getNumberId(formattedNumber);
-      if (!numberId || !numberId.exists) {
-        throw new Error(
-          `Phone number ${formattedNumber} does not exist on WhatsApp`
-        );
-      }
+      // // Validate the number exists on WhatsApp
+      // const numberId = await this.client.getNumberId(selfFormattedNumber);
+      // if (!numberId || !numberId.exists) {
+      //   throw new Error(
+      //     `Phone number ${selfFormattedNumber} does not exist on WhatsApp`
+      //   );
+      // }
 
       // Send the message
-      await this.client.sendMessage(numberId._serialized, message);
-      console.log(
-        `📤 Message sent to ${formattedNumber}: ${message.substring(0, 50)}...`
-      );
+      await this.client.sendMessage(phoneNumber, message);
+      // console.log(
+      //   `📤 Message sent to ${formattedNumber}: ${message.substring(0, 50)}...`
+      // );
     } catch (error) {
       console.error("Failed to send WhatsApp message:", error);
       throw new Error(`Failed to send message: ${error.message}`);
@@ -599,14 +599,14 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
 
       try {
         // Format and validate phone number
-        const formattedNumber = this.formatPhoneNumber(phoneNumber);
+        // const formattedNumber = this.formatPhoneNumber(phoneNumber);
 
-        await this.sendMessage(formattedNumber, message);
+        await this.sendMessage(phoneNumber, message);
         results.success++;
         this.addToLog(
-          `✅ Message sent to ${formattedNumber.substring(0, 10)}... (${
-            i + 1
-          }/${phoneNumbers.length})`
+          `✅ Message sent to ${phoneNumber.substring(0, 10)}... (${i + 1}/${
+            phoneNumbers.length
+          })`
         );
 
         // Add progressive delay to avoid rate limiting
