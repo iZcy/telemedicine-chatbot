@@ -29,7 +29,8 @@ class AIServiceManager {
     config: AIServiceConfig
   ): Promise<string> {
     const completion = await this.openai.chat.completions.create({
-      model: config.maxTokens <= 100 ? "gpt-3.5-turbo" : "gpt-4",
+      model: "gpt-4o-2024-08-06",
+      // config.maxTokens <= 100 ? "gpt-3.5-turbo" : "gpt-4",
       messages,
       temperature: config.temperature,
       max_tokens: config.maxTokens
@@ -53,7 +54,8 @@ class AIServiceManager {
     const response = await axios.post(
       this.deepSeekApiUrl,
       {
-        model: "deepseek/deepseek-r1:free",
+        model: "deepseek/deepseek-chat-v3-0324:free",
+        // "deepseek/deepseek-r1:free",
         messages,
         temperature: config.temperature,
         max_tokens: config.maxTokens
@@ -86,6 +88,7 @@ class AIServiceManager {
   }> {
     // Try OpenAI first
     try {
+      // throw new Error("Simulated OpenAI failure for testing fallback"); // Simulate failure for testing
       console.log("🤖 Attempting OpenAI API call...");
       const response = await this.callOpenAI(messages, config);
       console.log("✅ OpenAI API call successful");
