@@ -1,4 +1,4 @@
-// server/lib/whatsapp-service.ts - Enhanced version
+// server/lib/whatsapp-service.ts - Fixed version with better error handling
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth } = pkg;
 import qrcode from "qrcode-terminal";
@@ -22,6 +22,7 @@ export class WhatsAppService {
   private lastConnectedTime: string | null = null;
   private lastError: string | null = null;
   private connectionLogs: string[] = [];
+  private isInitializing = false;
 
   constructor() {
     this.initializeClient();
@@ -41,7 +42,11 @@ export class WhatsAppService {
           "--disable-accelerated-2d-canvas",
           "--no-first-run",
           "--no-zygote",
-          "--disable-gpu"
+          "--disable-gpu",
+          "--disable-extensions",
+          "--disable-background-timer-throttling",
+          "--disable-backgrounding-occluded-windows",
+          "--disable-renderer-backgrounding"
         ]
       }
     });
@@ -68,6 +73,7 @@ export class WhatsAppService {
       this.currentQRCode = null;
       this.lastConnectedTime = new Date().toISOString();
       this.lastError = null;
+      this.isInitializing = false;
       this.addToLog("WhatsApp connected and ready");
     });
 
@@ -81,6 +87,7 @@ export class WhatsAppService {
       console.error("❌ WhatsApp authentication failed:", msg);
       this.connectionState = "ERROR";
       this.lastError = `Authentication failed: ${msg}`;
+      this.isInitializing = false;
       this.addToLog(`Authentication failed: ${msg}`);
     });
 
@@ -89,6 +96,7 @@ export class WhatsAppService {
       this.connectionState = "DISCONNECTED";
       this.currentQRCode = null;
       this.activeSessions.clear();
+      this.isInitializing = false;
       this.addToLog(`Disconnected: ${reason}`);
     });
 
@@ -134,7 +142,13 @@ export class WhatsAppService {
   }
 
   async initialize() {
+    if (this.isInitializing) {
+      this.addToLog("Initialization already in progress");
+      return;
+    }
+
     try {
+      this.isInitializing = true;
       this.connectionState = "CONNECTING";
       this.lastError = null;
       this.addToLog("Initializing WhatsApp service...");
@@ -145,9 +159,71 @@ export class WhatsAppService {
       console.error("Failed to initialize WhatsApp service:", error);
       this.connectionState = "ERROR";
       this.lastError = error.message;
+      this.isInitializing = false;
       this.addToLog(`Initialization failed: ${error.message}`);
       throw error;
     }
+  }
+
+  // Phone number validation and formatting
+  private formatPhoneNumber(phoneNumber: string): string {
+    // Remove all non-numeric characters except +
+    let cleaned = phoneNumber.replace(/[^\d+]/g, "");
+
+    // If it starts with +, keep it
+    if (cleaned.startsWith("+")) {
+      return cleaned;
+    }
+
+    // If it starts with 0, replace with +62 (Indonesia)
+    if (cleaned.startsWith("0")) {
+      return "+62" + cleaned.substring(1);
+    }
+
+    // If it starts with 62, add +
+    if (cleaned.startsWith("62")) {
+      return "+" + cleaned;
+    }
+
+    // If it doesn't have country code, assume Indonesia
+    if (cleaned.length >= 10 && !cleaned.startsWith("62")) {
+      return "+62" + cleaned;
+    }
+
+    return "+" + cleaned;
+  }
+
+  private async validatePhoneNumber(phoneNumber: string): Promise<boolean> {
+    try {
+      const formattedNumber = this.formatPhoneNumber(phoneNumber);
+      const numberId = await this.client.getNumberId(formattedNumber);
+      return numberId && numberId.exists;
+    } catch (error) {
+      console.log(
+        `Phone number validation failed for ${phoneNumber}:`,
+        error.message
+      );
+      return false;
+    }
+  }
+
+  private async waitForConnection(maxWaitMs: number = 30000): Promise<boolean> {
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWaitMs) {
+      if (this.connectionState === "READY") {
+        return true;
+      }
+      if (
+        this.connectionState === "ERROR" ||
+        this.connectionState === "DISCONNECTED"
+      ) {
+        return false;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    return false;
   }
 
   private async handleMessage(message: any) {
@@ -168,6 +244,9 @@ export class WhatsAppService {
     this.addToLog(`Message received from ${phoneNumber.substring(0, 10)}...`);
 
     try {
+      // Send immediate acknowledgment/wait message
+      await this.sendWaitMessage(phoneNumber, messageText);
+
       // Get or create session
       let sessionId = this.activeSessions.get(phoneNumber);
       if (!sessionId) {
@@ -176,23 +255,140 @@ export class WhatsAppService {
         this.addToLog(`New session created: ${sessionId.substring(0, 20)}...`);
       }
 
-      // Process the message
+      // Process the message (this takes time)
       const response = await this.processMessage(
         sessionId,
         phoneNumber,
         messageText
       );
 
-      // Send response
+      // Send the actual response
       await this.sendMessage(phoneNumber, response);
       this.addToLog(`Response sent to ${phoneNumber.substring(0, 10)}...`);
     } catch (error) {
       console.error("Error handling WhatsApp message:", error);
       this.addToLog(`Error handling message: ${error.message}`);
-      await this.sendMessage(
-        phoneNumber,
-        "Maaf, saya sedang mengalami gangguan teknis. Silakan coba lagi nanti."
-      );
+      try {
+        await this.sendMessage(
+          phoneNumber,
+          "Maaf, saya sedang mengalami gangguan teknis. Silakan coba lagi nanti."
+        );
+      } catch (sendError) {
+        console.error("Failed to send error message:", sendError);
+      }
+    }
+  }
+
+  private async sendWaitMessage(
+    phoneNumber: string,
+    userMessage: string
+  ): Promise<void> {
+    try {
+      // Determine appropriate wait message based on user input
+      const waitMessage = this.getWaitMessage(userMessage);
+
+      // Send the wait message immediately
+      await this.sendMessage(phoneNumber, waitMessage);
+
+      // Optional: Send "typing" indicator (if supported)
+      await this.sendTypingIndicator(phoneNumber);
+    } catch (error) {
+      console.error("Failed to send wait message:", error);
+      // Don't throw error here, continue with main processing
+    }
+  }
+
+  private getWaitMessage(userMessage: string): string {
+    const lowerMessage = userMessage.toLowerCase();
+
+    // Check for special commands first
+    if (lowerMessage.includes("/start") || lowerMessage.includes("/mulai")) {
+      return ""; // No wait message for commands
+    }
+
+    if (lowerMessage.includes("/help") || lowerMessage.includes("/bantuan")) {
+      return ""; // No wait message for help
+    }
+
+    // Check for emergency keywords
+    const emergencyKeywords = [
+      "darurat",
+      "emergency",
+      "sesak napas",
+      "nyeri dada",
+      "pingsan",
+      "tidak sadar",
+      "kecelakaan",
+      "pendarahan",
+      "demam tinggi"
+    ];
+
+    if (emergencyKeywords.some((keyword) => lowerMessage.includes(keyword))) {
+      return "⚠️ *Pesan Darurat Terdeteksi*\n\nSaya sedang memproses informasi Anda dengan prioritas tinggi...\n\n_Jika ini darurat medis, segera hubungi 119 atau ke IGD terdekat._";
+    }
+
+    // Check for symptom-related messages
+    const symptomKeywords = [
+      "sakit",
+      "nyeri",
+      "demam",
+      "pusing",
+      "mual",
+      "batuk",
+      "pilek",
+      "diare",
+      "muntah",
+      "gatal",
+      "bengkak",
+      "lemas",
+      "sesak"
+    ];
+
+    if (symptomKeywords.some((keyword) => lowerMessage.includes(keyword))) {
+      return "🏥 Terima kasih telah menghubungi Asisten Medis!\n\nSaya sedang menganalisis gejala yang Anda sampaikan dan mencari informasi medis yang relevan...\n\n_Mohon tunggu sebentar, saya akan segera membalas._";
+    }
+
+    // Check for general health questions
+    const healthKeywords = [
+      "obat",
+      "vitamin",
+      "makanan",
+      "olahraga",
+      "diet",
+      "tidur",
+      "stress",
+      "hamil",
+      "anak",
+      "lansia",
+      "kesehatan"
+    ];
+
+    if (healthKeywords.some((keyword) => lowerMessage.includes(keyword))) {
+      return "💊 Saya sedang mencari informasi kesehatan terkini untuk menjawab pertanyaan Anda...\n\n_Tunggu sebentar ya, saya akan memberikan informasi yang akurat._";
+    }
+
+    // Default wait message for other queries
+    return "🤖 Terima kasih atas pesan Anda!\n\nSaya sedang memproses pertanyaan Anda dan menyiapkan respons yang tepat...\n\n_Mohon tunggu sebentar._";
+  }
+
+  private async sendTypingIndicator(phoneNumber: string): Promise<void> {
+    try {
+      // Send typing indicator if the WhatsApp client supports it
+      if (this.client && typeof this.client.sendPresenceUpdate === "function") {
+        await this.client.sendPresenceUpdate("composing", phoneNumber);
+
+        // Stop typing after a few seconds
+        setTimeout(async () => {
+          try {
+            await this.client.sendPresenceUpdate("paused", phoneNumber);
+          } catch (error) {
+            // Ignore errors for typing indicator
+          }
+        }, 5000);
+      }
+    } catch (error) {
+      // Typing indicator is optional, don't fail the main flow
+      console.log("Typing indicator not supported or failed:", error.message);
     }
   }
 
@@ -354,48 +550,85 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
     message: string
   ): Promise<void> {
     if (this.connectionState !== "READY") {
-      console.error("WhatsApp client is not ready");
-      throw new Error("WhatsApp client is not ready");
+      throw new Error(
+        `WhatsApp client is not ready. Current state: ${this.connectionState}`
+      );
     }
 
     try {
-      await this.client.sendMessage(phoneNumber, message);
+      // Format the phone number properly
+      const formattedNumber = this.formatPhoneNumber(phoneNumber);
+
+      // Validate the number exists on WhatsApp
+      const numberId = await this.client.getNumberId(formattedNumber);
+      if (!numberId || !numberId.exists) {
+        throw new Error(
+          `Phone number ${formattedNumber} does not exist on WhatsApp`
+        );
+      }
+
+      // Send the message
+      await this.client.sendMessage(numberId._serialized, message);
       console.log(
-        `📤 Message sent to ${phoneNumber}: ${message.substring(0, 50)}...`
+        `📤 Message sent to ${formattedNumber}: ${message.substring(0, 50)}...`
       );
     } catch (error) {
       console.error("Failed to send WhatsApp message:", error);
-      throw error;
+      throw new Error(`Failed to send message: ${error.message}`);
     }
   }
 
   async sendBulkMessage(
     phoneNumbers: string[],
     message: string
-  ): Promise<void> {
+  ): Promise<{ success: number; failed: number; errors: string[] }> {
     if (this.connectionState !== "READY") {
       throw new Error("WhatsApp client is not ready");
     }
 
     this.addToLog(`Starting bulk message to ${phoneNumbers.length} numbers`);
 
-    for (const phoneNumber of phoneNumbers) {
+    const results = {
+      success: 0,
+      failed: 0,
+      errors: [] as string[]
+    };
+
+    for (let i = 0; i < phoneNumbers.length; i++) {
+      const phoneNumber = phoneNumbers[i];
+
       try {
-        await this.sendMessage(phoneNumber, message);
-        this.addToLog(`Message sent to ${phoneNumber.substring(0, 10)}...`);
-        // Add delay to avoid rate limiting
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-      } catch (error) {
-        console.error(`Failed to send message to ${phoneNumber}:`, error);
+        // Format and validate phone number
+        const formattedNumber = this.formatPhoneNumber(phoneNumber);
+
+        await this.sendMessage(formattedNumber, message);
+        results.success++;
         this.addToLog(
-          `Failed to send to ${phoneNumber.substring(0, 10)}...: ${
-            error.message
-          }`
+          `✅ Message sent to ${formattedNumber.substring(0, 10)}... (${
+            i + 1
+          }/${phoneNumbers.length})`
         );
+
+        // Add progressive delay to avoid rate limiting
+        if (i < phoneNumbers.length - 1) {
+          const delay = Math.min(3000 + i * 500, 10000); // Progressive delay, max 10s
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+      } catch (error) {
+        results.failed++;
+        const errorMsg = `Failed to send to ${phoneNumber}: ${error.message}`;
+        results.errors.push(errorMsg);
+        this.addToLog(`❌ ${errorMsg}`);
+
+        // Continue with next number
+        continue;
       }
     }
 
-    this.addToLog(`Bulk message completed`);
+    this.addToLog(
+      `Bulk message completed: ${results.success} success, ${results.failed} failed`
+    );
+    return results;
   }
 
   async sendTestMessage(phoneNumber: string, message: string): Promise<void> {
@@ -403,7 +636,8 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
       throw new Error("WhatsApp client is not ready");
     }
 
-    await this.sendMessage(phoneNumber, `🧪 Test Message: ${message}`);
+    const testMessage = `🧪 *Test Message from Medical Chatbot*\n\n${message}\n\n_This is a test message to verify the connection._`;
+    await this.sendMessage(phoneNumber, testMessage);
     this.addToLog(`Test message sent to ${phoneNumber.substring(0, 10)}...`);
   }
 
@@ -420,7 +654,8 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
       connectionState: this.connectionState,
       activeSessions: this.activeSessions.size,
       lastConnected: this.lastConnectedTime,
-      error: this.lastError
+      error: this.lastError,
+      isInitializing: this.isInitializing
     };
   }
 
@@ -460,6 +695,7 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
       this.currentQRCode = null;
       this.activeSessions.clear();
       this.lastError = null;
+      this.isInitializing = false;
 
       this.addToLog("WhatsApp service disconnected successfully");
 
