@@ -1,7 +1,7 @@
-// src/pages/admin/AdminDashboard.tsx
+// src/pages/admin/AdminDashboard.tsx - Updated with WhatsApp link
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Database, MessageSquare, BarChart3, Settings, Bot, LogOut, Users, TrendingUp } from 'lucide-react';
+import { Database, MessageSquare, BarChart3, Settings, Bot, LogOut, Users, TrendingUp, Smartphone } from 'lucide-react';
 import AIServiceStatus from '@/components/admin/AIServiceStatus';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Main Actions */}
+        {/* Main Actions - Updated to include WhatsApp */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-gray-900">
           <Link to="/admin/knowledge" className="block">
             <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
@@ -233,6 +233,19 @@ export default function AdminDashboard() {
             </div>
           </Link>
 
+          <Link to="/admin/whatsapp" className="block">
+            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-center mb-4">
+                <Smartphone className="h-6 w-6 text-green-600" />
+                <h2 className="text-xl font-semibold ml-2">WhatsApp Integration</h2>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Kelola koneksi WhatsApp, kirim pesan massal, dan pantau sesi aktif.
+              </p>
+              <div className="text-green-600 font-medium">Kelola WhatsApp →</div>
+            </div>
+          </Link>
+
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center mb-4">
               <Bot className="h-6 w-6 text-purple-600" />
@@ -253,34 +266,6 @@ export default function AdminDashboard() {
               <div className="flex justify-between">
                 <span>RAG:</span>
                 <span className="font-medium text-green-600">Aktif</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center mb-4">
-              <Settings className="h-6 w-6 text-gray-600" />
-              <h2 className="text-xl font-semibold ml-2">Kesehatan Sistem</h2>
-            </div>
-            <p className="text-gray-600 mb-4">
-              Pantau performa sistem secara keseluruhan dan metrik kesehatan.
-            </p>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span>Database:</span>
-                <span className="text-green-600 font-medium">✓ Terhubung</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Server API:</span>
-                <span className="text-green-600 font-medium">✓ Berjalan</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Rate Limiting:</span>
-                <span className="text-green-600 font-medium">✓ Aktif</span>
-              </div>
-              <div className="flex justify-between">
-                <span>WhatsApp:</span>
-                <span className="text-blue-600 font-medium">✓ Tersedia</span>
               </div>
             </div>
           </div>

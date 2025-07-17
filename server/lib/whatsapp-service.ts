@@ -1,24 +1,48 @@
-// server/lib/whatsapp-service.ts
+// server/lib/whatsapp-service.ts - Enhanced version
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth } = pkg;
+import qrcode from "qrcode-terminal";
 import { prisma } from "./prisma";
 import { ragService } from "./rag-service";
 import { generateChatResponse, extractSymptoms } from "./openai";
 import { logKnowledgeGap } from "./knowledge-search";
 
+type ConnectionState =
+  | "DISCONNECTED"
+  | "CONNECTING"
+  | "CONNECTED"
+  | "READY"
+  | "ERROR";
+
 export class WhatsAppService {
   private client: any;
-  private isReady = false;
+  private connectionState: ConnectionState = "DISCONNECTED";
   private activeSessions = new Map<string, string>(); // phone -> sessionId
+  private currentQRCode: string | null = null;
+  private lastConnectedTime: string | null = null;
+  private lastError: string | null = null;
+  private connectionLogs: string[] = [];
 
   constructor() {
+    this.initializeClient();
+  }
+
+  private initializeClient() {
     this.client = new Client({
       authStrategy: new LocalAuth({
         clientId: "medical-chatbot"
       }),
       puppeteer: {
         headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"]
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-accelerated-2d-canvas",
+          "--no-first-run",
+          "--no-zygote",
+          "--disable-gpu"
+        ]
       }
     });
 
@@ -27,37 +51,101 @@ export class WhatsAppService {
 
   private setupEventListeners() {
     this.client.on("qr", (qr) => {
-      console.log("QR Code received, please scan with WhatsApp:");
-      console.log(qr);
+      console.log("📱 QR Code received, please scan with WhatsApp:");
+
+      // Display QR in terminal for debugging
+      qrcode.generate(qr, { small: true });
+
+      // Convert QR to base64 for web display
+      this.generateQRCode(qr);
+      this.addToLog("QR Code generated - Please scan with your WhatsApp");
+      this.connectionState = "CONNECTING";
     });
 
     this.client.on("ready", () => {
-      console.log("WhatsApp client is ready!");
-      this.isReady = true;
+      console.log("✅ WhatsApp client is ready!");
+      this.connectionState = "READY";
+      this.currentQRCode = null;
+      this.lastConnectedTime = new Date().toISOString();
+      this.lastError = null;
+      this.addToLog("WhatsApp connected and ready");
     });
 
-    this.client.on("message", this.handleMessage.bind(this));
-
     this.client.on("authenticated", () => {
-      console.log("WhatsApp authenticated");
+      console.log("🔐 WhatsApp authenticated");
+      this.connectionState = "CONNECTED";
+      this.addToLog("Authentication successful");
     });
 
     this.client.on("auth_failure", (msg) => {
-      console.error("WhatsApp authentication failed:", msg);
+      console.error("❌ WhatsApp authentication failed:", msg);
+      this.connectionState = "ERROR";
+      this.lastError = `Authentication failed: ${msg}`;
+      this.addToLog(`Authentication failed: ${msg}`);
     });
 
     this.client.on("disconnected", (reason) => {
-      console.log("WhatsApp disconnected:", reason);
-      this.isReady = false;
+      console.log("📱 WhatsApp disconnected:", reason);
+      this.connectionState = "DISCONNECTED";
+      this.currentQRCode = null;
+      this.activeSessions.clear();
+      this.addToLog(`Disconnected: ${reason}`);
     });
+
+    this.client.on("loading_screen", (percent, message) => {
+      console.log(`⏳ Loading: ${percent}% - ${message}`);
+      this.addToLog(`Loading: ${percent}% - ${message}`);
+    });
+
+    this.client.on("message", this.handleMessage.bind(this));
+  }
+
+  private async generateQRCode(qrString: string) {
+    try {
+      // Convert QR string to base64 image using qrcode library
+      const QRCode = await import("qrcode");
+      const qrBuffer = await QRCode.toBuffer(qrString, {
+        type: "png",
+        width: 256,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF"
+        }
+      });
+      this.currentQRCode = qrBuffer.toString("base64");
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      this.currentQRCode = null;
+    }
+  }
+
+  private addToLog(message: string) {
+    const timestamp = new Date().toISOString();
+    const logEntry = `[${timestamp}] ${message}`;
+    this.connectionLogs.unshift(logEntry);
+
+    // Keep only last 50 logs
+    if (this.connectionLogs.length > 50) {
+      this.connectionLogs = this.connectionLogs.slice(0, 50);
+    }
+
+    console.log(`📱 WhatsApp: ${message}`);
   }
 
   async initialize() {
     try {
+      this.connectionState = "CONNECTING";
+      this.lastError = null;
+      this.addToLog("Initializing WhatsApp service...");
+
       await this.client.initialize();
-      console.log("WhatsApp service initialized");
+      this.addToLog("WhatsApp service initialized");
     } catch (error) {
       console.error("Failed to initialize WhatsApp service:", error);
+      this.connectionState = "ERROR";
+      this.lastError = error.message;
+      this.addToLog(`Initialization failed: ${error.message}`);
       throw error;
     }
   }
@@ -76,7 +164,8 @@ export class WhatsAppService {
     const phoneNumber = message.from;
     const messageText = message.body;
 
-    console.log(`WhatsApp message from ${phoneNumber}: ${messageText}`);
+    console.log(`📨 WhatsApp message from ${phoneNumber}: ${messageText}`);
+    this.addToLog(`Message received from ${phoneNumber.substring(0, 10)}...`);
 
     try {
       // Get or create session
@@ -84,6 +173,7 @@ export class WhatsAppService {
       if (!sessionId) {
         sessionId = `wa_${phoneNumber}_${Date.now()}`;
         this.activeSessions.set(phoneNumber, sessionId);
+        this.addToLog(`New session created: ${sessionId.substring(0, 20)}...`);
       }
 
       // Process the message
@@ -95,8 +185,10 @@ export class WhatsAppService {
 
       // Send response
       await this.sendMessage(phoneNumber, response);
+      this.addToLog(`Response sent to ${phoneNumber.substring(0, 10)}...`);
     } catch (error) {
       console.error("Error handling WhatsApp message:", error);
+      this.addToLog(`Error handling message: ${error.message}`);
       await this.sendMessage(
         phoneNumber,
         "Maaf, saya sedang mengalami gangguan teknis. Silakan coba lagi nanti."
@@ -261,18 +353,19 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
     phoneNumber: string,
     message: string
   ): Promise<void> {
-    if (!this.isReady) {
+    if (this.connectionState !== "READY") {
       console.error("WhatsApp client is not ready");
-      return;
+      throw new Error("WhatsApp client is not ready");
     }
 
     try {
       await this.client.sendMessage(phoneNumber, message);
       console.log(
-        `Message sent to ${phoneNumber}: ${message.substring(0, 50)}...`
+        `📤 Message sent to ${phoneNumber}: ${message.substring(0, 50)}...`
       );
     } catch (error) {
       console.error("Failed to send WhatsApp message:", error);
+      throw error;
     }
   }
 
@@ -280,34 +373,102 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
     phoneNumbers: string[],
     message: string
   ): Promise<void> {
-    if (!this.isReady) {
-      console.error("WhatsApp client is not ready");
-      return;
+    if (this.connectionState !== "READY") {
+      throw new Error("WhatsApp client is not ready");
     }
+
+    this.addToLog(`Starting bulk message to ${phoneNumbers.length} numbers`);
 
     for (const phoneNumber of phoneNumbers) {
       try {
         await this.sendMessage(phoneNumber, message);
+        this.addToLog(`Message sent to ${phoneNumber.substring(0, 10)}...`);
         // Add delay to avoid rate limiting
         await new Promise((resolve) => setTimeout(resolve, 2000));
       } catch (error) {
         console.error(`Failed to send message to ${phoneNumber}:`, error);
+        this.addToLog(
+          `Failed to send to ${phoneNumber.substring(0, 10)}...: ${
+            error.message
+          }`
+        );
       }
     }
+
+    this.addToLog(`Bulk message completed`);
   }
 
+  async sendTestMessage(phoneNumber: string, message: string): Promise<void> {
+    if (this.connectionState !== "READY") {
+      throw new Error("WhatsApp client is not ready");
+    }
+
+    await this.sendMessage(phoneNumber, `🧪 Test Message: ${message}`);
+    this.addToLog(`Test message sent to ${phoneNumber.substring(0, 10)}...`);
+  }
+
+  // Status methods
   getStatus(): { isReady: boolean; activeSessions: number } {
     return {
-      isReady: this.isReady,
+      isReady: this.connectionState === "READY",
       activeSessions: this.activeSessions.size
     };
   }
 
+  getDetailedStatus() {
+    return {
+      connectionState: this.connectionState,
+      activeSessions: this.activeSessions.size,
+      lastConnected: this.lastConnectedTime,
+      error: this.lastError
+    };
+  }
+
+  getConnectionState(): ConnectionState {
+    return this.connectionState;
+  }
+
+  getCurrentQRCode(): string | null {
+    return this.currentQRCode;
+  }
+
+  getLastConnectedTime(): string | null {
+    return this.lastConnectedTime;
+  }
+
+  getLastError(): string | null {
+    return this.lastError;
+  }
+
+  getConnectionLogs(): string[] {
+    return this.connectionLogs;
+  }
+
+  isReady(): boolean {
+    return this.connectionState === "READY";
+  }
+
   async disconnect(): Promise<void> {
-    if (this.client) {
-      await this.client.destroy();
-      this.isReady = false;
+    try {
+      this.addToLog("Disconnecting WhatsApp service...");
+
+      if (this.client) {
+        await this.client.destroy();
+      }
+
+      this.connectionState = "DISCONNECTED";
+      this.currentQRCode = null;
       this.activeSessions.clear();
+      this.lastError = null;
+
+      this.addToLog("WhatsApp service disconnected successfully");
+
+      // Reinitialize client for next connection
+      this.initializeClient();
+    } catch (error) {
+      console.error("Error during disconnect:", error);
+      this.addToLog(`Disconnect error: ${error.message}`);
+      throw error;
     }
   }
 }

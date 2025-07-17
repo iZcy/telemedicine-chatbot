@@ -1,10 +1,11 @@
-// src/App.tsx
+// src/App.tsx - Updated with WhatsApp route
 import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import KnowledgePage from './pages/admin/KnowledgePage';
 import AnalyticsPage from './pages/admin/AnalyticsPage';
+import WhatsAppPage from './pages/admin/WhatsAppPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -41,6 +42,16 @@ function App() {
               <ErrorBoundary>
                 <ProtectedRoute requireAdmin>
                   <AnalyticsPage />
+                </ProtectedRoute>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="/admin/whatsapp"
+            element={
+              <ErrorBoundary>
+                <ProtectedRoute requireAdmin>
+                  <WhatsAppPage />
                 </ProtectedRoute>
               </ErrorBoundary>
             }
