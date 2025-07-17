@@ -1,30 +1,21 @@
 // src/hooks/useWaitingMessages.ts
 import { useState, useEffect } from "react";
 
-const OPENAI_WAITING_MESSAGES = [
-  "Ruminating",
-  "Processing your symptoms",
-  "Understanding medical context"
+const WAITING_MESSAGES = [
+  "Sedang berfikir mendalam...",
+  "Menganalisis gejala Anda...",
+  "Mencari informasi medis...",
+  "Memproses konteks kesehatan...",
+  "Menyusun respons yang akurat..."
 ];
 
-const DEEPSEEK_WAITING_MESSAGES = [
-  "Deep thinking",
-  "Analyzing patterns",
-  "Seeking insights"
-];
-
-export function useWaitingMessages(
-  provider: "openai" | "deepseek",
-  isActive: boolean
-) {
+export function useWaitingMessages(isActive: boolean) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isFading, setIsFading] = useState(false);
 
-  const messages =
-    provider === "openai" ? OPENAI_WAITING_MESSAGES : DEEPSEEK_WAITING_MESSAGES;
-  const currentMessage = messages[currentIndex];
+  const currentMessage = WAITING_MESSAGES[currentIndex];
 
   // Typing effect for current message
   useEffect(() => {
@@ -64,12 +55,12 @@ export function useWaitingMessages(
 
       // After fade out, change to next message
       setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % messages.length);
+        setCurrentIndex((prev) => (prev + 1) % WAITING_MESSAGES.length);
       }, 300); // Fade duration
-    }, 5000); // Display complete message
+    }, 4000); // Display complete message
 
     return () => clearTimeout(messageTimer);
-  }, [isActive, isTyping, currentIndex, messages.length]);
+  }, [isActive, isTyping, currentIndex]);
 
   return {
     displayText,

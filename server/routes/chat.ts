@@ -2,7 +2,8 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma";
 import { generateChatResponse, extractSymptoms } from "../lib/openai.js";
-import { searchKnowledge, logKnowledgeGap } from "../lib/knowledge-search.js";
+import { ragService } from "../lib/rag-service.js";
+import { logKnowledgeGap } from "../lib/knowledge-search.js";
 
 export const chatRouter = Router();
 
@@ -13,17 +14,17 @@ chatRouter.post("/", async (req, res) => {
     if (!message || !sessionId) {
       return res
         .status(400)
-        .json({ error: "Message and sessionId are required" });
+        .json({ error: "Message dan sessionId diperlukan" });
     }
 
     if (!message?.trim()) {
-      return res.status(400).json({ error: "Message cannot be empty" });
+      return res.status(400).json({ error: "Pesan tidak boleh kosong" });
     }
 
     if (message.length > 1000) {
       return res
         .status(400)
-        .json({ error: "Message too long. Please limit to 1000 characters." });
+        .json({ error: "Pesan terlalu panjang. Maksimal 1000 karakter." });
     }
 
     // Get or create chat session
@@ -39,7 +40,8 @@ chatRouter.post("/", async (req, res) => {
           context: {
             symptoms: [],
             conversationStage: "greeting",
-            userInfo: {}
+            userInfo: {},
+            platform: "web"
           }
         },
         include: { messages: true }
@@ -55,18 +57,19 @@ chatRouter.post("/", async (req, res) => {
       ...new Set([...(currentContext.symptoms || []), ...extractedSymptoms])
     ];
 
-    // Search knowledge base
-    const knowledgeResults = await searchKnowledge(message);
+    // Search knowledge base using RAG
+    const searchResults = await ragService.searchKnowledge(message);
 
-    if (knowledgeResults.length === 0) {
+    if (searchResults.length === 0) {
       await logKnowledgeGap(message);
     }
 
-    // Build context for LLM
-    const knowledgeContext = knowledgeResults
-      .map((entry) => `Title: ${entry.title}\nContent: ${entry.content}`)
-      .join("\n\n");
+    // Build knowledge context using RAG
+    const knowledgeContext = await ragService.buildKnowledgeContext(
+      searchResults
+    );
 
+    // Build conversation history
     const conversationHistory = session.messages
       .reverse()
       .map((msg) => `${msg.senderType}: ${msg.content}`)
@@ -74,10 +77,11 @@ chatRouter.post("/", async (req, res) => {
 
     const chatContext = {
       ...currentContext,
-      symptoms: updatedSymptoms
+      symptoms: updatedSymptoms,
+      platform: "web"
     };
 
-    // Generate response
+    // Generate response using RAG context
     const botResponse = await generateChatResponse(
       message,
       knowledgeContext,
@@ -111,27 +115,26 @@ chatRouter.post("/", async (req, res) => {
       data: { context: chatContext }
     });
 
-    // Log knowledge matches
-    for (const result of knowledgeResults) {
-      await prisma.queryMatch.create({
-        data: {
-          sessionId: session.id,
-          query: message,
-          entryId: result.id,
-          confidence: 0.8
-        }
-      });
-    }
+    // Log knowledge usage for analytics
+    await ragService.logKnowledgeUsage(session.id, message, searchResults);
 
     res.json({
       response: botResponse,
       sessionId: session.id,
-      context: chatContext
+      context: chatContext,
+      knowledgeUsed: searchResults.length > 0,
+      relevantSources: searchResults.map((r) => ({
+        title: r.entry.title,
+        category: r.entry.category,
+        relevanceScore: r.relevanceScore,
+        matchType: r.matchType
+      }))
     });
   } catch (error) {
     console.error("Chat API error:", error);
     res.status(500).json({
-      error: "I'm having trouble processing your request. Please try again."
+      error:
+        "Saya mengalami masalah dalam memproses permintaan Anda. Silakan coba lagi."
     });
   }
 });

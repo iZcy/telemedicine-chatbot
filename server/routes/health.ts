@@ -9,7 +9,7 @@ healthRouter.get("/", (req, res) => {
   res.json({
     status: "OK",
     timestamp: new Date().toISOString(),
-    service: "Telemedicine Chatbot API"
+    service: "API Chatbot Medis Telemedicine"
   });
 });
 
@@ -19,34 +19,26 @@ healthRouter.get("/ai", async (req, res) => {
     const healthStatus = await aiServiceManager.healthCheck();
 
     const overallStatus =
-      healthStatus.openai.status === "ok" ||
-      healthStatus.deepseek.status === "ok"
-        ? "healthy"
-        : "degraded";
+      healthStatus.deepseek.status === "ok" ? "healthy" : "degraded";
 
     res.json({
       status: overallStatus,
       timestamp: new Date().toISOString(),
       services: {
-        openai: {
-          status: healthStatus.openai.status,
-          latency: healthStatus.openai.latency,
-          configured: !!process.env.OPENAI_API_KEY
-        },
         deepseek: {
           status: healthStatus.deepseek.status,
           latency: healthStatus.deepseek.latency,
           configured: !!process.env.DEEPSEEK_API_KEY
         }
       },
-      fallback_available: !!process.env.DEEPSEEK_API_KEY
+      primary_service: "DeepSeek"
     });
   } catch (error) {
     console.error("Health check error:", error);
     res.status(500).json({
       status: "error",
       timestamp: new Date().toISOString(),
-      error: "Failed to perform health check"
+      error: "Gagal melakukan pemeriksaan kesehatan"
     });
   }
 });
@@ -59,31 +51,28 @@ healthRouter.get("/status", async (req, res) => {
     res.json({
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || "development",
-      ai_services: {
-        primary: {
-          provider: "OpenAI",
-          status: healthStatus.openai.status,
-          latency_ms: healthStatus.openai.latency,
-          configured: !!process.env.OPENAI_API_KEY,
-          model: "gpt-4 / gpt-3.5-turbo"
-        },
-        fallback: {
-          provider: "DeepSeek",
-          status: healthStatus.deepseek.status,
-          latency_ms: healthStatus.deepseek.latency,
-          configured: !!process.env.DEEPSEEK_API_KEY,
-          model: "deepseek-r1:free"
-        }
+      ai_service: {
+        provider: "DeepSeek",
+        status: healthStatus.deepseek.status,
+        latency_ms: healthStatus.deepseek.latency,
+        configured: !!process.env.DEEPSEEK_API_KEY,
+        model: "deepseek-chat"
       },
       database: {
         connected: true, // You can add actual DB health check here
         url_configured: !!process.env.DATABASE_URL
       },
+      whatsapp: {
+        enabled: process.env.ENABLE_WHATSAPP === "true",
+        configured: !!process.env.ENABLE_WHATSAPP
+      },
       features: {
         knowledge_base: true,
+        rag_search: true,
         symptom_extraction: true,
         conversation_history: true,
-        analytics: true
+        analytics: true,
+        whatsapp_integration: process.env.ENABLE_WHATSAPP === "true"
       }
     });
   } catch (error) {
@@ -91,7 +80,7 @@ healthRouter.get("/status", async (req, res) => {
     res.status(500).json({
       status: "error",
       timestamp: new Date().toISOString(),
-      error: "Failed to get system status"
+      error: "Gagal mendapatkan status sistem"
     });
   }
 });

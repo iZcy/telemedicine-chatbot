@@ -1,6 +1,6 @@
 // src/components/chat/ChatInterface.tsx
 import { useState, useEffect, useRef } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Brain } from 'lucide-react';
 import WaitingIndicator from './WaitingIndicator';
 import MessageBubble from './MessageBubble';
 
@@ -9,21 +9,26 @@ interface Message {
   content: string;
   sender: 'user' | 'bot';
   timestamp: Date;
+  sources?: Array<{
+    title: string;
+    category: string;
+    relevanceScore: number;
+    matchType: string;
+  }>;
 }
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [aiProvider, setAiProvider] = useState<'openai' | 'deepseek'>('openai');
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Welcome message
+    // Welcome message in Indonesian
     setMessages([{
       id: '1',
-      content: "Hello! I'm here to help you with your health questions.\n\nPlease remember that I provide general information only and you should consult with healthcare professionals for medical advice.\n\nHow can I assist you today?",
+      content: "Halo! Saya adalah asisten medis yang siap membantu Anda dengan pertanyaan kesehatan.\n\nHarap diingat bahwa saya hanya memberikan informasi umum dan Anda harus berkonsultasi dengan profesional kesehatan untuk saran medis.\n\nBagaimana saya dapat membantu Anda hari ini?",
       sender: 'bot',
       timestamp: new Date()
     }]);
@@ -58,8 +63,7 @@ export default function ChatInterface() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: inputMessage,
-          sessionId,
-          provider: aiProvider
+          sessionId
         })
       });
 
@@ -70,17 +74,18 @@ export default function ChatInterface() {
           id: (Date.now() + 1).toString(),
           content: data.response,
           sender: 'bot',
-          timestamp: new Date()
+          timestamp: new Date(),
+          sources: data.relevantSources || []
         };
         setMessages(prev => [...prev, botMessage]);
       } else {
-        throw new Error(data.error || 'Failed to send message');
+        throw new Error(data.error || 'Gagal mengirim pesan');
       }
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "I'm sorry, I'm having trouble responding right now. Please try again.",
+        content: "Maaf, saya mengalami kesulitan merespons sekarang. Silakan coba lagi.",
         sender: 'bot',
         timestamp: new Date()
       };
@@ -95,34 +100,14 @@ export default function ChatInterface() {
       {/* Header */}
       <div className="bg-blue-600 text-white p-4 rounded-t-lg">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold">Medical Assistant</h2>
-
-          {/* AI Provider Toggle */}
-          <div className="flex items-center gap-2 bg-blue-700 rounded-lg p-1">
-            <button
-              onClick={() => setAiProvider('openai')}
-              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${aiProvider === 'openai'
-                ? 'bg-white text-blue-600'
-                : 'text-blue-200 hover:text-white'
-                }`}
-              disabled={isLoading}
-            >
-              🧠 OpenAI
-            </button>
-            <button
-              onClick={() => setAiProvider('deepseek')}
-              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${aiProvider === 'deepseek'
-                ? 'bg-white text-blue-600'
-                : 'text-blue-200 hover:text-white'
-                }`}
-              disabled={isLoading}
-            >
-              🔮 DeepSeek
-            </button>
+          <h2 className="text-lg font-semibold">Asisten Medis</h2>
+          <div className="flex items-center gap-2 bg-blue-700 rounded-lg px-3 py-1">
+            <Brain className="w-4 h-4" />
+            <span className="text-xs font-medium">DeepSeek AI</span>
           </div>
         </div>
         <p className="text-sm opacity-90">
-          Ask me about your health concerns • Powered by {aiProvider === 'openai' ? 'OpenAI' : 'DeepSeek'}
+          Tanyakan tentang keluhan kesehatan Anda • Didukung oleh DeepSeek AI
         </p>
       </div>
 
@@ -134,13 +119,14 @@ export default function ChatInterface() {
             content={message.content}
             sender={message.sender}
             timestamp={message.timestamp}
+            sources={message.sources}
           />
         ))}
 
         {/* Waiting Indicator */}
         {isLoading && (
           <div className="flex justify-start">
-            <WaitingIndicator provider={aiProvider} />
+            <WaitingIndicator />
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -153,9 +139,10 @@ export default function ChatInterface() {
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            placeholder={`Ask ${aiProvider === 'openai' ? 'OpenAI' : 'DeepSeek'} about your health...`}
+            placeholder="Tanyakan tentang kesehatan Anda..."
             className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
             disabled={isLoading}
+            maxLength={1000}
           />
           <button
             type="submit"
@@ -168,14 +155,13 @@ export default function ChatInterface() {
 
         {/* Status indicator */}
         <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-          <span>
-            Using {aiProvider === 'openai' ? '🧠 OpenAI GPT-4' : '🔮 DeepSeek R1'}
-          </span>
+          <span>Menggunakan DeepSeek AI untuk respons yang akurat</span>
           {isLoading && (
             <span className="text-blue-600">
-              {aiProvider === 'openai' ? 'OpenAI is thinking...' : 'DeepSeek is processing...'}
+              Sedang memproses pertanyaan Anda...
             </span>
           )}
+          <span>{inputMessage.length}/1000</span>
         </div>
       </form>
     </div>

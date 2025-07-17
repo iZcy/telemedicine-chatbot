@@ -1,20 +1,26 @@
 // src/components/chat/MessageBubble.tsx
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, BookOpen, Tag } from 'lucide-react';
 
 interface MessageBubbleProps {
   content: string;
   sender: 'user' | 'bot';
   timestamp: Date;
+  sources?: Array<{
+    title: string;
+    category: string;
+    relevanceScore: number;
+    matchType: string;
+  }>;
 }
 
-export default function MessageBubble({ content, sender, timestamp }: MessageBubbleProps) {
+export default function MessageBubble({ content, sender, timestamp, sources }: MessageBubbleProps) {
   if (sender === 'user') {
     return (
       <div className="flex justify-end">
         <div className="max-w-[80%] bg-blue-600 text-white p-3 rounded-lg">
           <p className="text-sm whitespace-pre-wrap">{content}</p>
           <p className="text-xs opacity-70 mt-1">
-            {timestamp.toLocaleTimeString()}
+            {timestamp.toLocaleTimeString('id-ID')}
           </p>
         </div>
       </div>
@@ -28,8 +34,33 @@ export default function MessageBubble({ content, sender, timestamp }: MessageBub
         <div className="space-y-2">
           {formatBotMessage(content)}
         </div>
+
+        {/* Sources Section */}
+        {sources && sources.length > 0 && (
+          <div className="mt-3 pt-2 border-t border-gray-200">
+            <div className="flex items-center mb-2">
+              <BookOpen className="h-3 w-3 text-gray-500 mr-1" />
+              <span className="text-xs text-gray-500 font-medium">
+                Sumber referensi:
+              </span>
+            </div>
+            <div className="space-y-1">
+              {sources.slice(0, 3).map((source, index) => (
+                <div key={index} className="flex items-center text-xs text-gray-600">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-2 flex-shrink-0"></div>
+                  <span className="flex-1">{source.title}</span>
+                  <div className="flex items-center ml-2">
+                    <Tag className="h-3 w-3 mr-1" />
+                    <span className="text-blue-600 capitalize">{source.category}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <p className="text-xs opacity-70 text-gray-600 mt-2">
-          {timestamp.toLocaleTimeString()}
+          {timestamp.toLocaleTimeString('id-ID')}
         </p>
       </div>
     </div>
@@ -86,12 +117,14 @@ function formatBotMessage(content: string) {
 
 function isEmergencyWarning(text: string): boolean {
   const emergencyKeywords = [
-    'seek immediate medical',
-    'call emergency',
-    'emergency services',
-    'medical emergency',
-    'severe symptoms',
-    'sudden severe'
+    'segera cari bantuan medis',
+    'panggil layanan darurat',
+    'layanan darurat',
+    'darurat medis',
+    'gejala parah',
+    'mendadak parah',
+    'segera ke rumah sakit',
+    'hubungi dokter segera'
   ];
   return emergencyKeywords.some(keyword =>
     text.toLowerCase().includes(keyword)

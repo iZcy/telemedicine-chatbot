@@ -1,5 +1,4 @@
 // server/lib/ai-service-manager.ts
-import OpenAI from "openai";
 import axios from "axios";
 
 interface ChatMessage {
@@ -14,58 +13,32 @@ interface AIServiceConfig {
 }
 
 class AIServiceManager {
-  private openai: OpenAI;
   private deepSeekApiUrl = "https://openrouter.ai/api/v1/chat/completions";
   private defaultTimeout = 30000; // 30 seconds
 
   constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    });
-  }
-
-  private async callOpenAI(
-    messages: ChatMessage[],
-    config: AIServiceConfig
-  ): Promise<string> {
-    const completion = await this.openai.chat.completions.create({
-      model: "gpt-4o-2024-08-06",
-      // config.maxTokens <= 100 ? "gpt-3.5-turbo" : "gpt-4",
-      messages,
-      temperature: config.temperature,
-      max_tokens: config.maxTokens
-    });
-
-    const response = completion.choices[0].message.content;
-    if (!response) {
-      throw new Error("Empty response from OpenAI");
+    if (!process.env.DEEPSEEK_API_KEY) {
+      throw new Error("DEEPSEEK_API_KEY is required");
     }
-    return response;
   }
 
   private async callDeepSeek(
     messages: ChatMessage[],
     config: AIServiceConfig
   ): Promise<string> {
-    if (!process.env.DEEPSEEK_API_KEY) {
-      throw new Error("DeepSeek API key not configured");
-    }
-
     const response = await axios.post(
       this.deepSeekApiUrl,
       {
         model: "deepseek/deepseek-chat-v3-0324:free",
-        // "deepseek/deepseek-r1:free",
         messages,
         temperature: config.temperature,
-        max_tokens: config.maxTokens
+        max_tokens: config.maxTokens,
+        stream: false
       },
       {
         headers: {
           Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": process.env.CLIENT_URL || "http://localhost:3000",
-          "X-Title": "Telemedicine Chatbot"
+          "Content-Type": "application/json"
         },
         timeout: config.timeout || this.defaultTimeout
       }
@@ -83,97 +56,54 @@ class AIServiceManager {
     config: AIServiceConfig = { temperature: 0.7, maxTokens: 500 }
   ): Promise<{
     response: string;
-    provider: "openai" | "deepseek" | "fallback";
+    provider: "deepseek";
     error?: string;
   }> {
-    // Try OpenAI first
     try {
-      // throw new Error("Simulated OpenAI failure for testing fallback"); // Simulate failure for testing
-      console.log("🤖 Attempting OpenAI API call...");
-      const response = await this.callOpenAI(messages, config);
-      console.log("✅ OpenAI API call successful");
-      return { response, provider: "openai" };
-    } catch (openaiError) {
-      console.error("❌ OpenAI API failed:", openaiError);
+      console.log("🤖 Calling DeepSeek API...");
+      const response = await this.callDeepSeek(messages, config);
+      console.log("✅ DeepSeek API call successful");
+      return { response, provider: "deepseek" };
+    } catch (error) {
+      console.error("❌ DeepSeek API failed:", error);
 
-      // Try DeepSeek as fallback
-      try {
-        console.log("🔄 Falling back to DeepSeek API...");
-        const response = await this.callDeepSeek(messages, config);
-        console.log("✅ DeepSeek API call successful");
-        return { response, provider: "deepseek" };
-      } catch (deepSeekError) {
-        console.error("❌ DeepSeek API also failed:", deepSeekError);
-
-        const fallbackMessage = this.getFallbackMessage(
-          openaiError,
-          deepSeekError
-        );
-        return {
-          response: fallbackMessage,
-          provider: "fallback",
-          error: `OpenAI: ${openaiError.message}, DeepSeek: ${deepSeekError.message}`
-        };
-      }
+      const fallbackMessage = this.getFallbackMessage(error);
+      return {
+        response: fallbackMessage,
+        provider: "deepseek",
+        error: error.message
+      };
     }
   }
 
-  private getFallbackMessage(openaiError: any, deepSeekError: any): string {
-    // Check for specific error types to provide better user feedback
-    if (
-      openaiError.message?.includes("rate limit") ||
-      deepSeekError.message?.includes("rate limit")
-    ) {
-      return "I'm currently experiencing high demand. Please try again in a few minutes.";
+  private getFallbackMessage(error: any): string {
+    if (error.message?.includes("rate limit")) {
+      return "Saya sedang mengalami beban tinggi. Silakan coba lagi dalam beberapa menit.";
     }
 
-    if (
-      openaiError.message?.includes("timeout") ||
-      deepSeekError.message?.includes("timeout")
-    ) {
-      return "The request is taking longer than expected. Please try again with a shorter question.";
+    if (error.message?.includes("timeout")) {
+      return "Permintaan memakan waktu lebih lama dari yang diharapkan. Silakan coba lagi dengan pertanyaan yang lebih singkat.";
     }
 
-    if (!process.env.DEEPSEEK_API_KEY) {
-      return "I'm experiencing technical difficulties with my AI service and no backup is configured. Please try again later or contact support.";
-    }
-
-    return "I'm experiencing technical difficulties with both my primary and backup AI services. Please try again later or contact support if the issue persists.";
+    return "Saya sedang mengalami gangguan teknis. Silakan coba lagi nanti atau hubungi dukungan jika masalah berlanjut.";
   }
 
   // Health check method
   async healthCheck(): Promise<{
-    openai: { status: "ok" | "error"; latency?: number };
     deepseek: { status: "ok" | "error"; latency?: number };
   }> {
-    const testMessage: ChatMessage[] = [{ role: "user", content: "Hello" }];
+    const testMessage: ChatMessage[] = [{ role: "user", content: "Halo" }];
 
     const results = {
-      openai: { status: "error" as const, latency: undefined },
       deepseek: { status: "error" as const, latency: undefined }
     };
 
-    // Test OpenAI
     try {
       const start = Date.now();
-      await this.callOpenAI(testMessage, { temperature: 0.1, maxTokens: 10 });
-      results.openai = { status: "ok", latency: Date.now() - start };
+      await this.callDeepSeek(testMessage, { temperature: 0.1, maxTokens: 10 });
+      results.deepseek = { status: "ok", latency: Date.now() - start };
     } catch (error) {
-      console.error("OpenAI health check failed:", error);
-    }
-
-    // Test DeepSeek
-    if (process.env.DEEPSEEK_API_KEY) {
-      try {
-        const start = Date.now();
-        await this.callDeepSeek(testMessage, {
-          temperature: 0.1,
-          maxTokens: 10
-        });
-        results.deepseek = { status: "ok", latency: Date.now() - start };
-      } catch (error) {
-        console.error("DeepSeek health check failed:", error);
-      }
+      console.error("DeepSeek health check failed:", error);
     }
 
     return results;

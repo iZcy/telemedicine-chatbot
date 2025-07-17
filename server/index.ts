@@ -8,6 +8,9 @@ import { chatRouter } from "./routes/chat";
 import { knowledgeRouter } from "./routes/knowledge";
 import { healthRouter } from "./routes/health";
 import { authRouter } from "./routes/auth";
+import { statsRouter } from "./routes/stats";
+import { whatsappRouter } from "./routes/whatsapp";
+import { whatsappService } from "./lib/whatsapp-service";
 
 dotenv.config();
 
@@ -27,7 +30,7 @@ app.use(
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later.",
+  message: "Terlalu banyak permintaan dari IP ini, silakan coba lagi nanti.",
   standardHeaders: true,
   legacyHeaders: false
 });
@@ -40,6 +43,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/knowledge", knowledgeRouter);
+app.use("/api/stats", statsRouter);
+app.use("/api/whatsapp", whatsappRouter);
 app.use("/health", healthRouter);
 
 // Legacy health check (for backward compatibility)
@@ -50,13 +55,15 @@ app.get("/health", (req, res) => {
 // Root endpoint
 app.get("/", (req, res) => {
   res.json({
-    message: "Telemedicine Chatbot API",
+    message: "Chatbot Medis Telemedicine API",
     version: "1.0.0",
     status: "running",
     endpoints: {
       auth: "/api/auth",
       chat: "/api/chat",
       knowledge: "/api/knowledge",
+      stats: "/api/stats",
+      whatsapp: "/api/whatsapp",
       health: "/health",
       ai_health: "/health/ai",
       status: "/health/status"
@@ -78,7 +85,7 @@ app.use(
     const isDevelopment = process.env.NODE_ENV === "development";
 
     res.status(err.status || 500).json({
-      error: isDevelopment ? err.message : "Internal server error",
+      error: isDevelopment ? err.message : "Terjadi kesalahan server internal",
       timestamp: new Date().toISOString(),
       ...(isDevelopment && { stack: err.stack })
     });
@@ -88,12 +95,14 @@ app.use(
 // 404 handler
 app.use("*", (req, res) => {
   res.status(404).json({
-    error: "Endpoint not found",
+    error: "Endpoint tidak ditemukan",
     timestamp: new Date().toISOString(),
     available_endpoints: {
       auth: "/api/auth",
       chat: "/api/chat",
       knowledge: "/api/knowledge",
+      stats: "/api/stats",
+      whatsapp: "/api/whatsapp",
       health: "/health",
       ai_health: "/health/ai",
       status: "/health/status"
@@ -101,13 +110,32 @@ app.use("*", (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+// Initialize WhatsApp service if enabled
+async function initializeServices() {
+  if (process.env.ENABLE_WHATSAPP === "true") {
+    try {
+      console.log("🟢 Initializing WhatsApp service...");
+      await whatsappService.initialize();
+      console.log("✅ WhatsApp service initialized successfully");
+    } catch (error) {
+      console.error("❌ Failed to initialize WhatsApp service:", error);
+      console.log("📱 WhatsApp service will be disabled");
+    }
+  }
+}
+
+app.listen(PORT, async () => {
+  console.log(`🚀 Server berjalan di port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`🔐 JWT Secret configured: ${!!process.env.JWT_SECRET}`);
-  console.log(`🤖 OpenAI configured: ${!!process.env.OPENAI_API_KEY}`);
+  console.log(`🤖 DeepSeek configured: ${!!process.env.DEEPSEEK_API_KEY}`);
+  console.log(`📊 Health check tersedia di: http://localhost:${PORT}/health`);
   console.log(
-    `🔄 DeepSeek fallback configured: ${!!process.env.DEEPSEEK_API_KEY}`
+    `📱 WhatsApp service: ${
+      process.env.ENABLE_WHATSAPP === "true" ? "Enabled" : "Disabled"
+    }`
   );
-  console.log(`📊 Health check available at: http://localhost:${PORT}/health`);
+
+  // Initialize services after server starts
+  await initializeServices();
 });
