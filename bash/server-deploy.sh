@@ -47,25 +47,11 @@ mkdir -p logs
 pm2 stop all 2>/dev/null || true
 pm2 delete all 2>/dev/null || true
 
-# Start backend server
-pm2 start npm --name "telemedicine-backend" -- run dev:server \
-    --cwd /var/www/telemedicine-chatbot \
-    --env NODE_ENV=development \
-    --env PORT=3001 \
-    --error ./logs/backend-err.log \
-    --output ./logs/backend-out.log \
-    --log ./logs/backend-combined.log \
-    --time
+# Start backend server (simplified command)
+pm2 start npm --name "telemedicine-backend" -- run dev:server
 
-# Start frontend server
-pm2 start npm --name "telemedicine-frontend" -- run dev:client \
-    --cwd /var/www/telemedicine-chatbot \
-    --env NODE_ENV=development \
-    --env PORT=3000 \
-    --error ./logs/frontend-err.log \
-    --output ./logs/frontend-out.log \
-    --log ./logs/frontend-combined.log \
-    --time
+# Start frontend server (simplified command) 
+pm2 start npm --name "telemedicine-frontend" -- run dev:client
 
 # Save PM2 configuration
 pm2 save
@@ -86,3 +72,8 @@ echo "⚠️ Don't forget to:"
 echo "1. Edit .env with your actual API keys"
 echo "2. Update nginx configuration"
 echo "3. Test the application"
+echo ""
+echo "🧪 Test the deployment:"
+echo "curl http://localhost:3001/health"
+echo "curl -I http://localhost:3000"
+echo "curl -I https://telemedicine.kecamatanbayan.id"
