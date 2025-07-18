@@ -45,7 +45,7 @@ npm run build
 echo "⚡ Starting servers with PM2..."
 
 # Create PM2 ecosystem for both frontend and backend
-cat > ecosystem.config.js << 'EOF'
+cat > ecosystem.config.cjs << 'EOF'
 module.exports = {
   apps: [
     {
