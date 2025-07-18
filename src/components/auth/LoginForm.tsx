@@ -13,14 +13,13 @@ export default function LoginForm() {
     email: '',
     password: '',
   });
-  const [name, setName] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login, register } = useAuth();
+  const { login } = useAuth();
 
   // Event handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,34 +30,13 @@ export default function LoginForm() {
     }));
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
-  };
-
   const togglePasswordVisibility = () => {
     setShowPassword(prev => !prev);
-  };
-
-  const resetForm = () => {
-    setFormData({ email: '', password: '' });
-    setName('');
-    setError('');
-    setSuccess('');
-  };
-
-  const toggleMode = () => {
-    setIsRegistering(prev => !prev);
-    resetForm();
   };
 
   const validateForm = (): boolean => {
     if (!formData.email || !formData.password) {
       setError('Please fill in all fields');
-      return false;
-    }
-
-    if (isRegistering && !name) {
-      setError('Please enter your name');
       return false;
     }
 
@@ -77,12 +55,10 @@ export default function LoginForm() {
     }
 
     try {
-      const result = isRegistering
-        ? await register(formData.email, formData.password, name)
-        : await login(formData.email, formData.password);
+      const result = await login(formData.email, formData.password);
 
       if (result.success) {
-        setSuccess(isRegistering ? 'Registration successful!' : 'Login successful!');
+        setSuccess('Login successful!');
       } else {
         setError(result.error || 'An error occurred');
       }
@@ -116,31 +92,11 @@ export default function LoginForm() {
         <Lock className="w-8 h-8 text-blue-600" />
       </div>
       <h1 className="text-2xl font-bold text-gray-900">
-        {isRegistering ? 'Create Account' : 'Welcome Back'}
+        Welcome Back
       </h1>
       <p className="text-gray-600 mt-2">
-        {isRegistering
-          ? 'Sign up to access the medical chatbot'
-          : 'Sign in to your account'}
+        Sign in to your account
       </p>
-    </div>
-  );
-
-  const renderNameField = () => (
-    <div>
-      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-        Full Name
-      </label>
-      <input
-        type="text"
-        id="name"
-        value={name}
-        onChange={handleNameChange}
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
-        placeholder="Enter your full name"
-        required={isRegistering}
-        disabled={isLoading}
-      />
     </div>
   );
 
@@ -205,36 +161,16 @@ export default function LoginForm() {
       {isLoading ? (
         <div className="flex items-center justify-center">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-          {isRegistering ? 'Creating Account...' : 'Signing In...'}
+          Signing In...
         </div>
       ) : (
-        isRegistering ? 'Create Account' : 'Sign In'
+        'Sign In'
       )}
     </button>
   );
 
   const renderFooter = () => (
     <>
-      <div className="mt-6 text-center">
-        <p className="text-gray-600">
-          {isRegistering ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <button
-            onClick={toggleMode}
-            className="text-blue-600 hover:text-blue-700 font-medium"
-            disabled={isLoading}
-          >
-            {isRegistering ? 'Sign In' : 'Sign Up'}
-          </button>
-        </p>
-      </div>
-
-      {!isRegistering && (
-        <div className="mt-4 text-center">
-          <a href="#" className="text-sm text-blue-600 hover:text-blue-700">
-            Forgot your password?
-          </a>
-        </div>
-      )}
     </>
   );
 
@@ -247,7 +183,6 @@ export default function LoginForm() {
         {success && renderAlert('success', success)}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {isRegistering && renderNameField()}
           {renderEmailField()}
           {renderPasswordField()}
           {renderSubmitButton()}

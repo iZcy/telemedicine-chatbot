@@ -12,7 +12,6 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -91,30 +90,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (email: string, password: string, name: string) => {
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, name }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        setUser(data.user);
-        return { success: true };
-      } else {
-        return { success: false, error: data.error || 'Registration failed' };
-      }
-    } catch (error) {
-      return { success: false, error: 'Network error. Please try again.' };
-    }
-  };
-
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
@@ -124,7 +99,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     loading,
     login,
-    register,
     logout,
   };
 
