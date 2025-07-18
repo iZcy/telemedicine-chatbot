@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Simple deployment script - build and run directly on server
-# Much simpler approach for development/small production environments
+# Simple deployment script without PM2 config file
+# Directly start processes with PM2 commands
 
 set -e
 
@@ -17,10 +17,6 @@ sudo chown -R $USER:$USER $PROJECT_DIR
 
 # Navigate to project directory
 cd $PROJECT_DIR
-
-# If this is first time, clone or copy your project
-# git clone your-repo-url . 
-# OR copy your files here
 
 echo "📦 Installing dependencies..."
 npm install
@@ -44,42 +40,6 @@ npm run build
 
 echo "⚡ Starting servers with PM2..."
 
-# Create PM2 ecosystem file with proper ES module format
-cat > ecosystem.config.js << 'EOF'
-export default {
-  apps: [
-    {
-      name: 'telemedicine-frontend',
-      script: 'npm',
-      args: 'run dev:client',
-      cwd: '/var/www/telemedicine-chatbot',
-      env: {
-        NODE_ENV: 'development',
-        PORT: 3000
-      },
-      error_file: './logs/frontend-err.log',
-      out_file: './logs/frontend-out.log',
-      log_file: './logs/frontend-combined.log',
-      time: true
-    },
-    {
-      name: 'telemedicine-backend',
-      script: 'npm',
-      args: 'run dev:server',
-      cwd: '/var/www/telemedicine-chatbot',
-      env: {
-        NODE_ENV: 'development',
-        PORT: 3001
-      },
-      error_file: './logs/backend-err.log',
-      out_file: './logs/backend-out.log',
-      log_file: './logs/backend-combined.log',
-      time: true
-    }
-  ]
-};
-EOF
-
 # Create logs directory
 mkdir -p logs
 
@@ -87,8 +47,27 @@ mkdir -p logs
 pm2 stop all 2>/dev/null || true
 pm2 delete all 2>/dev/null || true
 
-# Start both frontend and backend
-pm2 start ecosystem.config.js
+# Start backend server
+pm2 start npm --name "telemedicine-backend" -- run dev:server \
+    --cwd /var/www/telemedicine-chatbot \
+    --env NODE_ENV=development \
+    --env PORT=3001 \
+    --error ./logs/backend-err.log \
+    --output ./logs/backend-out.log \
+    --log ./logs/backend-combined.log \
+    --time
+
+# Start frontend server
+pm2 start npm --name "telemedicine-frontend" -- run dev:client \
+    --cwd /var/www/telemedicine-chatbot \
+    --env NODE_ENV=development \
+    --env PORT=3000 \
+    --error ./logs/frontend-err.log \
+    --output ./logs/frontend-out.log \
+    --log ./logs/frontend-combined.log \
+    --time
+
+# Save PM2 configuration
 pm2 save
 pm2 startup
 
