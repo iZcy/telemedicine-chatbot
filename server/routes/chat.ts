@@ -93,22 +93,109 @@ chatRouter.post("/", async (req, res) => {
         .json({ error: "Pesan terlalu panjang. Maksimal 1000 karakter." });
     }
 
-    // Send immediate acknowledgment response
-    const waitMessage = getWaitMessage(message);
-
-    // Return wait message immediately
-    res.json({
-      response: waitMessage,
-      sessionId: sessionId,
-      isWaitMessage: true,
-      context: { processing: true },
-      knowledgeUsed: false,
-      relevantSources: []
+    // Get or create chat session
+    let session = await prisma.chatSession.findUnique({
+      where: { id: sessionId },
+      include: { messages: { orderBy: { timestamp: "desc" }, take: 10 } }
     });
 
-    // Process the actual message asynchronously
-    processMessageAsync(message, sessionId).catch((error) => {
-      console.error("Async message processing failed:", error);
+    if (!session) {
+      session = await prisma.chatSession.create({
+        data: {
+          id: sessionId,
+          context: {
+            symptoms: [],
+            conversationStage: "greeting",
+            userInfo: {},
+            platform: "web"
+          }
+        },
+        include: { messages: true }
+      });
+    }
+
+    // Extract symptoms from user message
+    const extractedSymptoms = await extractSymptoms(message);
+
+    // Update session context
+    const currentContext = session.context as any;
+    const updatedSymptoms = [
+      ...new Set([...(currentContext.symptoms || []), ...extractedSymptoms])
+    ];
+
+    // Search knowledge base using RAG
+    const searchResults = await ragService.searchKnowledge(message);
+
+    if (searchResults.length === 0) {
+      await logKnowledgeGap(message);
+    }
+
+    // Build knowledge context using RAG
+    const knowledgeContext = await ragService.buildKnowledgeContext(
+      searchResults
+    );
+
+    // Build conversation history
+    const conversationHistory = session.messages
+      .reverse()
+      .map((msg) => `${msg.senderType}: ${msg.content}`)
+      .join("\n");
+
+    const chatContext = {
+      ...currentContext,
+      symptoms: updatedSymptoms,
+      platform: "web"
+    };
+
+    // Generate response using RAG context
+    const botResponse = await generateChatResponse(
+      message,
+      knowledgeContext,
+      conversationHistory,
+      chatContext
+    );
+
+    // Save user message
+    await prisma.chatMessage.create({
+      data: {
+        sessionId: session.id,
+        senderType: "USER",
+        content: message,
+        intentDetected:
+          extractedSymptoms.length > 0 ? "symptom_report" : "general_inquiry"
+      }
+    });
+
+    // Save bot response
+    await prisma.chatMessage.create({
+      data: {
+        sessionId: session.id,
+        senderType: "BOT",
+        content: botResponse
+      }
+    });
+
+    // Update session context
+    await prisma.chatSession.update({
+      where: { id: session.id },
+      data: { context: chatContext }
+    });
+
+    // Log knowledge usage for analytics
+    await ragService.logKnowledgeUsage(session.id, message, searchResults);
+
+    // Return the actual response immediately
+    res.json({
+      response: botResponse,
+      sessionId: sessionId,
+      context: chatContext,
+      knowledgeUsed: searchResults.length > 0,
+      relevantSources: searchResults.map((result) => ({
+        title: result.entry.title,
+        category: result.entry.category,
+        relevanceScore: result.relevanceScore,
+        matchType: result.matchType
+      }))
     });
   } catch (error) {
     console.error("Chat API error:", error);

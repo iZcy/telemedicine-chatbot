@@ -1,7 +1,6 @@
-// src/components/chat/ChatInterface.tsx
+// src/components/chat/ChatInterface.tsx - Simplified without wait message
 import { useState, useEffect, useRef } from 'react';
 import { Send, Brain } from 'lucide-react';
-import WaitingIndicator from './WaitingIndicator';
 import MessageBubble from './MessageBubble';
 
 interface Message {
@@ -36,7 +35,7 @@ export default function ChatInterface() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]);
+  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -96,9 +95,9 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-full max-h-[600px] bg-white rounded-lg shadow-lg">
+    <div className="flex flex-col h-full max-h-[80vh] bg-white rounded-lg shadow-lg">
       {/* Header */}
-      <div className="bg-blue-600 text-white p-4 rounded-t-lg">
+      <div className="bg-blue-600 text-white p-4 rounded-t-lg flex-shrink-0">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-semibold">Asisten Medis</h2>
           <div className="flex items-center gap-2 bg-blue-700 rounded-lg px-3 py-1">
@@ -111,8 +110,8 @@ export default function ChatInterface() {
         </p>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Messages - Scrollable */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
         {messages.map((message) => (
           <MessageBubble
             key={message.id}
@@ -123,47 +122,53 @@ export default function ChatInterface() {
           />
         ))}
 
-        {/* Waiting Indicator */}
+        {/* Loading indicator */}
         {isLoading && (
           <div className="flex justify-start">
-            <WaitingIndicator />
+            <div className="max-w-[80%] bg-gray-100 text-gray-900 p-3 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
+                <span className="text-sm text-gray-600">Sedang memproses...</span>
+              </div>
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={sendMessage} className="p-4 border-t">
-        <div className="flex space-x-2">
-          <input
-            type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Tanyakan tentang kesehatan Anda..."
-            className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-            disabled={isLoading}
-            maxLength={1000}
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !inputMessage.trim()}
-            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Send className="h-4 w-4" />
-          </button>
-        </div>
+      {/* Input - Fixed at bottom */}
+      <div className="p-4 border-t flex-shrink-0">
+        <form onSubmit={sendMessage} className="space-y-2">
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Tanyakan tentang kesehatan Anda..."
+              className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              disabled={isLoading}
+              maxLength={1000}
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !inputMessage.trim()}
+              className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
 
-        {/* Status indicator */}
-        <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-          <span>Menggunakan DeepSeek AI untuk respons yang akurat</span>
-          {isLoading && (
-            <span className="text-blue-600">
-              Sedang memproses pertanyaan Anda...
-            </span>
-          )}
-          <span>{inputMessage.length}/1000</span>
-        </div>
-      </form>
+          {/* Status indicator */}
+          <div className="flex justify-between items-center text-xs text-gray-500">
+            <span>Menggunakan DeepSeek AI untuk respons yang akurat</span>
+            <span>{inputMessage.length}/1000</span>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
