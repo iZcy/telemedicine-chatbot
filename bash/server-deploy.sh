@@ -31,31 +31,8 @@ sudo systemctl start postgresql
 
 # Create database if it doesn't exist
 sudo -u postgres psql -c "CREATE DATABASE IF NOT EXISTS telemedicine_chatbot;" 2>/dev/null || true
-sudo -u postgres psql -c "CREATE USER IF NOT EXISTS chatbot_user WITH ENCRYPTED PASSWORD 'your_password';" 2>/dev/null || true
+sudo -u postgres psql -c "CREATE USER IF NOT EXISTS chatbot_user WITH ENCRYPTED PASSWORD 'chatbot_user';" 2>/dev/null || true
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE telemedicine_chatbot TO chatbot_user;" 2>/dev/null || true
-
-# Set up environment file
-echo "⚙️ Setting up environment..."
-cat > .env << 'EOF'
-# Database
-DATABASE_URL="postgresql://chatbot_user:your_password@localhost:5432/telemedicine_chatbot"
-
-# DeepSeek AI
-DEEPSEEK_API_KEY="your-deepseek-api-key"
-
-# JWT & Auth
-JWT_SECRET="your-jwt-secret-key"
-ADMIN_EMAIL="admin@kecamatanbayan.id"
-ADMIN_PASSWORD="admin123"
-
-# App Config
-NODE_ENV="development"
-PORT=3001
-CLIENT_URL="https://telemedicine.kecamatanbayan.id"
-
-# WhatsApp
-ENABLE_WHATSAPP="true"
-EOF
 
 echo "🔧 Setting up database schema..."
 npx prisma generate
