@@ -1,4 +1,4 @@
-// server/lib/whatsapp-service.ts - Fixed TypeScript version
+// server/lib/whatsapp-service.ts - Complete enhanced version
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth } = pkg;
 import qrcode from "qrcode-terminal";
@@ -23,6 +23,8 @@ export class WhatsAppService {
   private lastError: string | null = null;
   private connectionLogs: string[] = [];
   private isInitializing = false;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 3;
 
   constructor() {
     this.initializeClient();
@@ -46,9 +48,15 @@ export class WhatsAppService {
           "--disable-extensions",
           "--disable-background-timer-throttling",
           "--disable-backgrounding-occluded-windows",
-          "--disable-renderer-backgrounding"
-        ]
-      }
+          "--disable-renderer-backgrounding",
+          "--disable-features=VizDisplayCompositor",
+          "--disable-ipc-flooding-protection"
+        ],
+        timeout: 60000 // Increase timeout
+      },
+      // Add session save frequency to prevent session corruption
+      takeoverOnConflict: false,
+      takeoverTimeoutMs: 0
     });
 
     this.setupEventListeners();
@@ -57,14 +65,11 @@ export class WhatsAppService {
   private setupEventListeners() {
     this.client.on("qr", (qr: string) => {
       console.log("📱 QR Code received, please scan with WhatsApp:");
-
-      // Display QR in terminal for debugging
       qrcode.generate(qr, { small: true });
-
-      // Convert QR to base64 for web display
       this.generateQRCode(qr);
       this.addToLog("QR Code generated - Please scan with your WhatsApp");
       this.connectionState = "CONNECTING";
+      this.reconnectAttempts = 0; // Reset attempts on new QR
     });
 
     this.client.on("ready", () => {
@@ -74,6 +79,7 @@ export class WhatsAppService {
       this.lastConnectedTime = new Date().toISOString();
       this.lastError = null;
       this.isInitializing = false;
+      this.reconnectAttempts = 0;
       this.addToLog("WhatsApp connected and ready");
     });
 
@@ -89,15 +95,24 @@ export class WhatsAppService {
       this.lastError = `Authentication failed: ${msg}`;
       this.isInitializing = false;
       this.addToLog(`Authentication failed: ${msg}`);
+      this.clearAllSessions();
     });
 
     this.client.on("disconnected", (reason: string) => {
       console.log("📱 WhatsApp disconnected:", reason);
       this.connectionState = "DISCONNECTED";
       this.currentQRCode = null;
-      this.activeSessions.clear();
       this.isInitializing = false;
       this.addToLog(`Disconnected: ${reason}`);
+      this.clearAllSessions();
+
+      // Auto-reconnect logic for unexpected disconnections
+      if (
+        reason !== "LOGOUT" &&
+        this.reconnectAttempts < this.maxReconnectAttempts
+      ) {
+        this.attemptReconnect();
+      }
     });
 
     this.client.on("loading_screen", (percent: number, message: string) => {
@@ -105,12 +120,157 @@ export class WhatsAppService {
       this.addToLog(`Loading: ${percent}% - ${message}`);
     });
 
+    // Add error event handler
+    this.client.on("error", (error: any) => {
+      console.error("❌ WhatsApp client error:", error);
+      this.addToLog(`Client error: ${error.message || error}`);
+
+      // Handle specific error types
+      if (error.message && error.message.includes("Evaluation failed")) {
+        this.addToLog(
+          "Puppeteer evaluation error detected - attempting recovery"
+        );
+        this.handleEvaluationError();
+      }
+    });
+
     this.client.on("message", this.handleMessage.bind(this));
+  }
+
+  // 🔄 Auto-reconnect logic
+  private async attemptReconnect() {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      this.addToLog("Max reconnection attempts reached");
+      return;
+    }
+
+    this.reconnectAttempts++;
+    const delay = Math.min(5000 * this.reconnectAttempts, 30000); // Exponential backoff, max 30s
+
+    this.addToLog(
+      `Attempting reconnection ${this.reconnectAttempts}/${
+        this.maxReconnectAttempts
+      } in ${delay / 1000}s...`
+    );
+
+    setTimeout(async () => {
+      try {
+        if (this.connectionState === "DISCONNECTED") {
+          await this.initialize();
+        }
+      } catch (error) {
+        this.addToLog(`Reconnection attempt ${this.reconnectAttempts} failed`);
+      }
+    }, delay);
+  }
+
+  // 🛠️ Handle evaluation errors
+  private async handleEvaluationError() {
+    try {
+      this.addToLog("Attempting to recover from evaluation error...");
+
+      // Try to restart the client
+      if (this.client) {
+        await this.client.destroy();
+      }
+
+      // Wait a bit before reinitializing
+      setTimeout(() => {
+        this.initializeClient();
+      }, 3000);
+    } catch (error) {
+      this.addToLog("Recovery attempt failed");
+    }
+  }
+
+  // 🧹 Clear all stored sessions
+  private clearAllSessions() {
+    const sessionCount = this.activeSessions.size;
+
+    if (sessionCount > 0) {
+      console.log(`🧹 Clearing ${sessionCount} active WhatsApp sessions...`);
+      this.addToLog(`Clearing ${sessionCount} active sessions`);
+
+      this.activeSessions.clear();
+
+      this.endDatabaseSessions().catch((error) => {
+        console.error("Error ending database sessions:", error);
+        this.addToLog("Error clearing database sessions");
+      });
+
+      this.addToLog("All sessions cleared successfully");
+    }
+  }
+
+  // 🧹 Clear WhatsApp authentication data
+  private async clearWhatsAppAuth(): Promise<void> {
+    try {
+      const fs = await import("fs");
+      const path = await import("path");
+
+      const sessionPath = path.join(process.cwd(), ".wwebjs_auth");
+      const cachePath = path.join(process.cwd(), ".wwebjs_cache");
+
+      if (fs.existsSync(sessionPath)) {
+        fs.rmSync(sessionPath, { recursive: true, force: true });
+        this.addToLog("WhatsApp authentication data cleared");
+        console.log("🧹 WhatsApp authentication data removed");
+      }
+
+      if (fs.existsSync(cachePath)) {
+        fs.rmSync(cachePath, { recursive: true, force: true });
+        this.addToLog("WhatsApp cache data cleared");
+        console.log("🧹 WhatsApp cache data removed");
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("Error clearing WhatsApp auth data:", error);
+      this.addToLog(`Error clearing auth data: ${errorMessage}`);
+    }
+  }
+
+  // 🧹 End all WhatsApp sessions in database
+  private async endDatabaseSessions(): Promise<void> {
+    try {
+      const activeSessions = await prisma.chatSession.findMany({
+        where: {
+          status: "ACTIVE",
+          context: {
+            path: ["platform"],
+            equals: "whatsapp"
+          }
+        }
+      });
+
+      if (activeSessions.length > 0) {
+        await prisma.chatSession.updateMany({
+          where: {
+            status: "ACTIVE",
+            context: {
+              path: ["platform"],
+              equals: "whatsapp"
+            }
+          },
+          data: {
+            status: "ENDED",
+            endedAt: new Date()
+          }
+        });
+
+        console.log(
+          `📝 Ended ${activeSessions.length} WhatsApp sessions in database`
+        );
+        this.addToLog(`Ended ${activeSessions.length} database sessions`);
+      }
+    } catch (error) {
+      console.error("Failed to end database sessions:", error);
+      throw error;
+    }
   }
 
   private async generateQRCode(qrString: string) {
     try {
-      // Convert QR string to base64 image using qrcode library
       const QRCode = await import("qrcode");
       const qrBuffer = await QRCode.toBuffer(qrString, {
         type: "png",
@@ -133,7 +293,6 @@ export class WhatsAppService {
     const logEntry = `[${timestamp}] ${message}`;
     this.connectionLogs.unshift(logEntry);
 
-    // Keep only last 50 logs
     if (this.connectionLogs.length > 50) {
       this.connectionLogs = this.connectionLogs.slice(0, 50);
     }
@@ -163,81 +322,16 @@ export class WhatsAppService {
       this.lastError = errorMessage;
       this.isInitializing = false;
       this.addToLog(`Initialization failed: ${errorMessage}`);
+      this.clearAllSessions();
       throw error;
     }
   }
 
-  // Phone number validation and formatting
-  // private formatPhoneNumber(phoneNumber: string): string {
-  //   // Remove all non-numeric characters except +
-  //   let cleaned = phoneNumber.replace(/[^\d+]/g, "");
-
-  //   // If it starts with +, keep it
-  //   if (cleaned.startsWith("+")) {
-  //     return cleaned;
-  //   }
-
-  //   // If it starts with 0, replace with +62 (Indonesia)
-  //   if (cleaned.startsWith("0")) {
-  //     return "+62" + cleaned.substring(1);
-  //   }
-
-  //   // If it starts with 62, add +
-  //   if (cleaned.startsWith("62")) {
-  //     return "+" + cleaned;
-  //   }
-
-  //   // If it doesn't have country code, assume Indonesia
-  //   if (cleaned.length >= 10 && !cleaned.startsWith("62")) {
-  //     return "+62" + cleaned;
-  //   }
-
-  //   return "+" + cleaned;
-  // }
-
-  // Remove unused method or implement it
-  // private async validatePhoneNumber(phoneNumber: string): Promise<boolean> {
-  //   try {
-  //     const formattedNumber = this.formatPhoneNumber(phoneNumber);
-  //     const numberId = await this.client.getNumberId(formattedNumber);
-  //     return numberId && numberId.exists;
-  //   } catch (error) {
-  //     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-  //     console.log(
-  //       `Phone number validation failed for ${phoneNumber}:`,
-  //       errorMessage
-  //     );
-  //     return false;
-  //   }
-  // }
-
-  // Remove unused method or implement it
-  // private async waitForConnection(maxWaitMs: number = 30000): Promise<boolean> {
-  //   const startTime = Date.now();
-
-  //   while (Date.now() - startTime < maxWaitMs) {
-  //     if (this.connectionState === "READY") {
-  //       return true;
-  //     }
-  //     if (
-  //       this.connectionState === "ERROR" ||
-  //       this.connectionState === "DISCONNECTED"
-  //     ) {
-  //       return false;
-  //     }
-  //     await new Promise((resolve) => setTimeout(resolve, 1000));
-  //   }
-
-  //   return false;
-  // }
-
   private async handleMessage(message: any) {
-    // Ignore messages from status and groups
     if (message.from === "status@broadcast" || message.from.includes("@g.us")) {
       return;
     }
 
-    // Ignore messages from bot itself
     if (message.fromMe) {
       return;
     }
@@ -249,10 +343,8 @@ export class WhatsAppService {
     this.addToLog(`Message received from ${phoneNumber.substring(0, 10)}...`);
 
     try {
-      // Send immediate acknowledgment/wait message
       await this.sendWaitMessage(phoneNumber, messageText);
 
-      // Get or create session
       let sessionId = this.activeSessions.get(phoneNumber);
       if (!sessionId) {
         sessionId = `wa_${phoneNumber}_${Date.now()}`;
@@ -260,14 +352,12 @@ export class WhatsAppService {
         this.addToLog(`New session created: ${sessionId.substring(0, 20)}...`);
       }
 
-      // Process the message (this takes time)
       const response = await this.processMessage(
         sessionId,
         phoneNumber,
         messageText
       );
 
-      // Send the actual response
       await this.sendMessage(phoneNumber, response);
       this.addToLog(`Response sent to ${phoneNumber.substring(0, 10)}...`);
     } catch (error) {
@@ -291,33 +381,25 @@ export class WhatsAppService {
     userMessage: string
   ): Promise<void> {
     try {
-      // Determine appropriate wait message based on user input
       const waitMessage = this.getWaitMessage(userMessage);
-
-      // Send the wait message immediately
       await this.sendMessage(phoneNumber, waitMessage);
-
-      // Optional: Send "typing" indicator (if supported)
       await this.sendTypingIndicator(phoneNumber);
     } catch (error) {
       console.error("Failed to send wait message:", error);
-      // Don't throw error here, continue with main processing
     }
   }
 
   private getWaitMessage(userMessage: string): string {
     const lowerMessage = userMessage.toLowerCase();
 
-    // Check for special commands first
     if (lowerMessage.includes("/start") || lowerMessage.includes("/mulai")) {
-      return ""; // No wait message for commands
+      return "";
     }
 
     if (lowerMessage.includes("/help") || lowerMessage.includes("/bantuan")) {
-      return ""; // No wait message for help
+      return "";
     }
 
-    // Check for emergency keywords
     const emergencyKeywords = [
       "darurat",
       "emergency",
@@ -334,7 +416,6 @@ export class WhatsAppService {
       return "⚠️ *Pesan Darurat Terdeteksi*\n\nSaya sedang memproses informasi Anda dengan prioritas tinggi...\n\n_Jika ini darurat medis, segera hubungi 119 atau ke IGD terdekat._";
     }
 
-    // Check for symptom-related messages
     const symptomKeywords = [
       "sakit",
       "nyeri",
@@ -355,7 +436,6 @@ export class WhatsAppService {
       return "🏥 Terima kasih telah menghubungi Asisten Medis!\n\nSaya sedang menganalisis gejala yang Anda sampaikan dan mencari informasi medis yang relevan...\n\n_Mohon tunggu sebentar, saya akan segera membalas._";
     }
 
-    // Check for general health questions
     const healthKeywords = [
       "obat",
       "vitamin",
@@ -374,17 +454,14 @@ export class WhatsAppService {
       return "💊 Saya sedang mencari informasi kesehatan terkini untuk menjawab pertanyaan Anda...\n\n_Tunggu sebentar ya, saya akan memberikan informasi yang akurat._";
     }
 
-    // Default wait message for other queries
     return "🤖 Terima kasih atas pesan Anda!\n\nSaya sedang memproses pertanyaan Anda dan menyiapkan respons yang tepat...\n\n_Mohon tunggu sebentar._";
   }
 
   private async sendTypingIndicator(phoneNumber: string): Promise<void> {
     try {
-      // Send typing indicator if the WhatsApp client supports it
       if (this.client && typeof this.client.sendPresenceUpdate === "function") {
         await this.client.sendPresenceUpdate("composing", phoneNumber);
 
-        // Stop typing after a few seconds
         setTimeout(async () => {
           try {
             await this.client.sendPresenceUpdate("paused", phoneNumber);
@@ -394,7 +471,6 @@ export class WhatsAppService {
         }, 5000);
       }
     } catch (error) {
-      // Typing indicator is optional, don't fail the main flow
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       console.log("Typing indicator not supported or failed:", errorMessage);
@@ -406,7 +482,6 @@ export class WhatsAppService {
     phoneNumber: string,
     messageText: string
   ): Promise<string> {
-    // Handle special commands
     if (
       messageText.toLowerCase().trim() === "/start" ||
       messageText.toLowerCase().trim() === "/mulai"
@@ -429,7 +504,6 @@ export class WhatsAppService {
       return "Sesi chat telah berakhir. Terima kasih telah menggunakan layanan kami. Ketik /start untuk memulai sesi baru.";
     }
 
-    // Get or create chat session
     let session = await prisma.chatSession.findUnique({
       where: { id: sessionId },
       include: { messages: { orderBy: { timestamp: "desc" }, take: 10 } }
@@ -450,28 +524,23 @@ export class WhatsAppService {
       });
     }
 
-    // Extract symptoms from user message
     const extractedSymptoms = await extractSymptoms(messageText);
 
-    // Update session context
     const currentContext = session.context as any;
     const updatedSymptoms = [
       ...new Set([...(currentContext.symptoms || []), ...extractedSymptoms])
     ];
 
-    // Search knowledge base using RAG
     const searchResults = await ragService.searchKnowledge(messageText);
 
     if (searchResults.length === 0) {
       await logKnowledgeGap(messageText);
     }
 
-    // Build knowledge context
     const knowledgeContext = await ragService.buildKnowledgeContext(
       searchResults
     );
 
-    // Build conversation history
     const conversationHistory = session.messages
       .reverse()
       .map((msg) => `${msg.senderType}: ${msg.content}`)
@@ -483,7 +552,6 @@ export class WhatsAppService {
       platform: "whatsapp"
     };
 
-    // Generate response
     const botResponse = await generateChatResponse(
       messageText,
       knowledgeContext,
@@ -491,7 +559,6 @@ export class WhatsAppService {
       chatContext
     );
 
-    // Save user message
     await prisma.chatMessage.create({
       data: {
         sessionId: session.id,
@@ -502,7 +569,6 @@ export class WhatsAppService {
       }
     });
 
-    // Save bot response
     await prisma.chatMessage.create({
       data: {
         sessionId: session.id,
@@ -511,13 +577,11 @@ export class WhatsAppService {
       }
     });
 
-    // Update session context
     await prisma.chatSession.update({
       where: { id: session.id },
       data: { context: chatContext }
     });
 
-    // Log knowledge usage
     await ragService.logKnowledgeUsage(session.id, messageText, searchResults);
 
     return botResponse;
@@ -554,9 +618,11 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
 ⚠️ *Dalam keadaan darurat, segera hubungi 119 atau ke rumah sakit terdekat.*`;
   }
 
+  // 🛡️ Enhanced sendMessage with retry logic
   private async sendMessage(
     phoneNumber: string,
-    message: string
+    message: string,
+    retryCount: number = 0
   ): Promise<void> {
     if (this.connectionState !== "READY") {
       throw new Error(
@@ -565,16 +631,38 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
     }
 
     try {
-      // Send the message
+      if (retryCount > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 2000 * retryCount));
+      }
+
       await this.client.sendMessage(phoneNumber, message);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
+
+      if (errorMessage.includes("Evaluation failed") && retryCount < 2) {
+        this.addToLog(
+          `Evaluation error, retrying... (attempt ${retryCount + 1})`
+        );
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        return this.sendMessage(phoneNumber, message, retryCount + 1);
+      }
+
+      if (
+        errorMessage.includes("Session closed") ||
+        errorMessage.includes("Protocol error")
+      ) {
+        this.addToLog("Session error detected, triggering reconnection");
+        this.connectionState = "ERROR";
+        this.handleEvaluationError();
+      }
+
       console.error("Failed to send WhatsApp message:", error);
       throw new Error(`Failed to send message: ${errorMessage}`);
     }
   }
 
+  // 🛡️ Enhanced bulk message with better error handling
   async sendBulkMessage(
     phoneNumbers: string[],
     message: string
@@ -594,6 +682,13 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
     for (let i = 0; i < phoneNumbers.length; i++) {
       const phoneNumber = phoneNumbers[i];
 
+      if (this.connectionState !== "READY") {
+        const errorMsg = `Connection lost during bulk send at ${i}/${phoneNumbers.length}`;
+        results.errors.push(errorMsg);
+        this.addToLog(errorMsg);
+        break;
+      }
+
       try {
         await this.sendMessage(phoneNumber, message);
         results.success++;
@@ -603,9 +698,8 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
           })`
         );
 
-        // Add progressive delay to avoid rate limiting
         if (i < phoneNumbers.length - 1) {
-          const delay = Math.min(3000 + i * 500, 10000); // Progressive delay, max 10s
+          const delay = Math.min(5000 + i * 1000, 15000); // Progressive delay, max 15s
           await new Promise((resolve) => setTimeout(resolve, delay));
         }
       } catch (error) {
@@ -616,7 +710,13 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
         results.errors.push(errorMsg);
         this.addToLog(`❌ ${errorMsg}`);
 
-        // Continue with next number
+        if (errorMessage.includes("Evaluation failed")) {
+          this.addToLog(
+            "Evaluation error in bulk send, waiting 10s before continuing..."
+          );
+          await new Promise((resolve) => setTimeout(resolve, 10000));
+        }
+
         continue;
       }
     }
@@ -651,7 +751,9 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
       activeSessions: this.activeSessions.size,
       lastConnected: this.lastConnectedTime,
       error: this.lastError,
-      isInitializing: this.isInitializing
+      isInitializing: this.isInitializing,
+      reconnectAttempts: this.reconnectAttempts,
+      maxReconnectAttempts: this.maxReconnectAttempts
     };
   }
 
@@ -679,30 +781,85 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
     return this.connectionState === "READY";
   }
 
+  // 🧹 PUBLIC METHOD: Manually clear sessions
+  public async clearSessions(): Promise<{ cleared: number }> {
+    const sessionCount = this.activeSessions.size;
+    this.clearAllSessions();
+    return { cleared: sessionCount };
+  }
+
+  // 🧹 PUBLIC METHOD: Get session information
+  public getSessionInfo(): {
+    activeCount: number;
+    sessions: Array<{ phone: string; sessionId: string; duration: string }>;
+  } {
+    const sessions = Array.from(this.activeSessions.entries()).map(
+      ([phone, sessionId]) => ({
+        phone: phone.substring(0, 10) + "...",
+        sessionId: sessionId.substring(0, 20) + "...",
+        duration: "Active"
+      })
+    );
+
+    return {
+      activeCount: this.activeSessions.size,
+      sessions
+    };
+  }
+
   async disconnect(): Promise<void> {
     try {
       this.addToLog("Disconnecting WhatsApp service...");
+
+      this.clearAllSessions();
 
       if (this.client) {
         await this.client.destroy();
       }
 
+      await this.clearWhatsAppAuth();
+
       this.connectionState = "DISCONNECTED";
       this.currentQRCode = null;
-      this.activeSessions.clear();
       this.lastError = null;
       this.isInitializing = false;
 
       this.addToLog("WhatsApp service disconnected successfully");
 
-      // Reinitialize client for next connection
       this.initializeClient();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       console.error("Error during disconnect:", error);
       this.addToLog(`Disconnect error: ${errorMessage}`);
+
+      this.clearAllSessions();
+      await this.clearWhatsAppAuth();
       throw error;
+    }
+  }
+
+  // 🧹 PUBLIC METHOD: Force logout (clear auth + disconnect)
+  public async forceLogout(): Promise<{
+    cleared: number;
+    authCleared: boolean;
+  }> {
+    try {
+      const sessionCount = this.activeSessions.size;
+      await this.disconnect();
+
+      return {
+        cleared: sessionCount,
+        authCleared: true
+      };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      this.addToLog(`Force logout error: ${errorMessage}`);
+      return {
+        cleared: 0,
+        authCleared: false
+      };
     }
   }
 }

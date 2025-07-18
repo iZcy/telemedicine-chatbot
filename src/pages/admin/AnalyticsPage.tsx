@@ -237,7 +237,7 @@ export default function AnalyticsPage() {
               <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
               Celah Pengetahuan
             </h3>
-            <div className="space-y-3">
+            <div className="max-h-96 overflow-y-auto pr-3">
               {knowledgeGaps.length > 0 ? (
                 knowledgeGaps.map((gap, index) => (
                   <div key={index} className="border-l-4 border-red-400 pl-4 py-2">

@@ -1,4 +1,4 @@
-// src/pages/admin/WhatsAppPage.tsx
+// src/pages/admin/WhatsAppPage.tsx - Updated with session management
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -14,7 +14,9 @@ import {
   AlertTriangle,
   Smartphone,
   Wifi,
-  WifiOff
+  WifiOff,
+  Trash2,
+  Eye
 } from 'lucide-react';
 
 interface WhatsAppStatus {
@@ -24,6 +26,11 @@ interface WhatsAppStatus {
   lastConnected?: string;
   qrCode?: string;
   error?: string;
+}
+
+interface SessionInfo {
+  activeCount: number;
+  sessions: Array<{ phone: string; sessionId: string; duration: string }>;
 }
 
 interface BulkMessageData {
@@ -38,8 +45,13 @@ export default function WhatsAppPage() {
     activeSessions: 0,
     connectionState: 'DISCONNECTED'
   });
+  const [sessionInfo, setSessionInfo] = useState<SessionInfo>({
+    activeCount: 0,
+    sessions: []
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [showBulkMessage, setShowBulkMessage] = useState(false);
+  const [showSessions, setShowSessions] = useState(false);
   const [bulkMessageData, setBulkMessageData] = useState<BulkMessageData>({
     phoneNumbers: '',
     message: ''
@@ -48,6 +60,7 @@ export default function WhatsAppPage() {
 
   useEffect(() => {
     fetchStatus();
+    fetchSessionInfo();
     // Poll status every 5 seconds when connecting
     const interval = setInterval(() => {
       if (status.connectionState === 'CONNECTING') {
@@ -75,6 +88,23 @@ export default function WhatsAppPage() {
       if (error instanceof Error) {
         addToLog('Error fetching status: ' + error.message);
       }
+    }
+  };
+
+  const fetchSessionInfo = async () => {
+    try {
+      const response = await fetch('/api/whatsapp/sessions', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSessionInfo(data);
+      }
+    } catch (error) {
+      console.error('Error fetching session info:', error);
     }
   };
 
@@ -127,17 +157,92 @@ export default function WhatsAppPage() {
         }
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        addToLog('WhatsApp service disconnected successfully');
+        addToLog(`WhatsApp service disconnected successfully. ${data.sessionsCleared} sessions cleared.`);
         setStatus({
           isReady: false,
           activeSessions: 0,
           connectionState: 'DISCONNECTED'
         });
+        setSessionInfo({
+          activeCount: 0,
+          sessions: []
+        });
       }
     } catch (error) {
       if (error instanceof Error) {
         addToLog('Error disconnecting: ' + error.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add this handler to your WhatsAppPage component:
+  const handleForceLogout = async () => {
+    setIsLoading(true);
+    addToLog('Force logout - clearing all WhatsApp authentication...');
+
+    try {
+      const response = await fetch('/api/whatsapp/force-logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        addToLog(`Force logout successful. ${data.sessionsCleared} sessions cleared, auth data removed.`);
+        setStatus({
+          isReady: false,
+          activeSessions: 0,
+          connectionState: 'DISCONNECTED'
+        });
+        setSessionInfo({
+          activeCount: 0,
+          sessions: []
+        });
+      } else {
+        addToLog('Failed to force logout: ' + data.error);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        addToLog('Error during force logout: ' + error.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 🧹 NEW: Clear sessions without disconnecting
+  const handleClearSessions = async () => {
+    setIsLoading(true);
+    addToLog('Clearing active sessions...');
+
+    try {
+      const response = await fetch('/api/whatsapp/clear-sessions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        addToLog(`Successfully cleared ${data.sessionsCleared} sessions`);
+        await fetchSessionInfo();
+        await fetchStatus();
+      } else {
+        addToLog('Failed to clear sessions: ' + data.error);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        addToLog('Error clearing sessions: ' + error.message);
       }
     } finally {
       setIsLoading(false);
@@ -169,10 +274,14 @@ export default function WhatsAppPage() {
         })
       });
 
-      if (response.ok) {
-        addToLog(`Bulk message sent to ${phoneNumbers.length} numbers`);
+      const data = await response.json();
+
+      if (response.ok || response.status === 207) { // 207 = partial success
+        addToLog(`Bulk message result: ${data.results.successful}/${data.results.total} sent successfully`);
         setBulkMessageData({ phoneNumbers: '', message: '' });
         setShowBulkMessage(false);
+      } else {
+        addToLog('Bulk message failed: ' + data.error);
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -307,7 +416,7 @@ export default function WhatsAppPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex space-x-4 mt-4">
+              <div className="flex flex-wrap gap-3 mt-4">
                 {status.connectionState === 'DISCONNECTED' || status.connectionState === 'ERROR' ? (
                   <button
                     onClick={handleInitialize}
@@ -322,24 +431,58 @@ export default function WhatsAppPage() {
                     Connect WhatsApp
                   </button>
                 ) : (
-                  <button
-                    onClick={handleDisconnect}
-                    disabled={isLoading}
-                    className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
-                  >
-                    <WifiOff className="h-4 w-4 mr-2" />
-                    Disconnect
-                  </button>
+                  <>
+                    <button
+                      onClick={handleDisconnect}
+                      disabled={isLoading}
+                      className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                    >
+                      <WifiOff className="h-4 w-4 mr-2" />
+                      Disconnect
+                    </button>
+                    <button
+                      onClick={handleForceLogout}
+                      disabled={isLoading}
+                      className="flex items-center px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-900 disabled:opacity-50 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Force Logout
+                    </button>
+                  </>
                 )}
 
                 {status.connectionState === 'READY' && (
-                  <button
-                    onClick={() => setShowBulkMessage(true)}
-                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Bulk Message
-                  </button>
+                  <>
+                    <button
+                      onClick={() => setShowBulkMessage(true)}
+                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Send className="h-4 w-4 mr-2" />
+                      Send Bulk Message
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setShowSessions(true);
+                        fetchSessionInfo();
+                      }}
+                      className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Sessions ({sessionInfo.activeCount})
+                    </button>
+
+                    {sessionInfo.activeCount > 0 && (
+                      <button
+                        onClick={handleClearSessions}
+                        disabled={isLoading}
+                        className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Clear Sessions
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -387,8 +530,9 @@ export default function WhatsAppPage() {
                 <p>• Click "Connect WhatsApp" to start the connection process</p>
                 <p>• A QR code will appear that you need to scan with your WhatsApp</p>
                 <p>• Once connected, you can send bulk messages to multiple users</p>
-                <p>• The system will automatically handle message delivery</p>
-                <p>• Users can interact with the bot directly through WhatsApp</p>
+                <p>• Use "Disconnect" to temporarily disconnect while keeping auth</p>
+                <p>• Use "Force Logout" to completely clear auth and connect different account</p>
+                <p>• Sessions are automatically cleared when disconnecting</p>
               </div>
             </div>
           </div>
@@ -417,6 +561,10 @@ export default function WhatsAppPage() {
                   <span className="font-medium">
                     {status.isReady ? 'Running' : 'Stopped'}
                   </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Sessions:</span>
+                  <span className="font-medium">{sessionInfo.activeCount}</span>
                 </div>
               </div>
             </div>
@@ -448,10 +596,72 @@ export default function WhatsAppPage() {
                 <p>• QR code expires after 2 minutes</p>
                 <p>• Only one device can be connected at a time</p>
                 <p>• Service will auto-restart if disconnected</p>
+                <p>• Sessions are cleared on disconnect to prevent issues</p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Session Management Modal */}
+        {showSessions && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Active WhatsApp Sessions</h3>
+                <button
+                  onClick={fetchSessionInfo}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </button>
+              </div>
+
+              {sessionInfo.sessions.length > 0 ? (
+                <div className="space-y-3">
+                  {sessionInfo.sessions.map((session, index) => (
+                    <div key={index} className="border rounded-lg p-3">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-medium">Phone: {session.phone}</p>
+                          <p className="text-sm text-gray-600">Session: {session.sessionId}</p>
+                          <p className="text-sm text-gray-600">Status: {session.duration}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="flex justify-between items-center pt-4 border-t">
+                    <span className="text-sm text-gray-600">
+                      Total: {sessionInfo.activeCount} active sessions
+                    </span>
+                    <button
+                      onClick={handleClearSessions}
+                      disabled={isLoading}
+                      className="flex items-center px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">No active sessions</p>
+                </div>
+              )}
+
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={() => setShowSessions(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Bulk Message Modal */}
         {showBulkMessage && (
