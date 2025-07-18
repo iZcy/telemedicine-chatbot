@@ -8,7 +8,6 @@ import {
   XCircle,
   Loader2,
   Users,
-  Send,
   LogOut,
   RefreshCw,
   AlertTriangle,
@@ -33,11 +32,6 @@ interface SessionInfo {
   sessions: Array<{ phone: string; sessionId: string; duration: string }>;
 }
 
-interface BulkMessageData {
-  phoneNumbers: string;
-  message: string;
-}
-
 export default function WhatsAppPage() {
   const { logout } = useAuth();
   const [status, setStatus] = useState<WhatsAppStatus>({
@@ -50,12 +44,7 @@ export default function WhatsAppPage() {
     sessions: []
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [showBulkMessage, setShowBulkMessage] = useState(false);
   const [showSessions, setShowSessions] = useState(false);
-  const [bulkMessageData, setBulkMessageData] = useState<BulkMessageData>({
-    phoneNumbers: '',
-    message: ''
-  });
   const [connectionLog, setConnectionLog] = useState<string[]>([]);
 
   useEffect(() => {
@@ -249,49 +238,6 @@ export default function WhatsAppPage() {
     }
   };
 
-  const handleBulkMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!bulkMessageData.phoneNumbers.trim() || !bulkMessageData.message.trim()) {
-      return;
-    }
-
-    setIsLoading(true);
-    const phoneNumbers = bulkMessageData.phoneNumbers
-      .split('\n')
-      .map(num => num.trim())
-      .filter(num => num);
-
-    try {
-      const response = await fetch('/api/whatsapp/bulk-message', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          phoneNumbers,
-          message: bulkMessageData.message
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok || response.status === 207) { // 207 = partial success
-        addToLog(`Bulk message result: ${data.results.successful}/${data.results.total} sent successfully`);
-        setBulkMessageData({ phoneNumbers: '', message: '' });
-        setShowBulkMessage(false);
-      } else {
-        addToLog('Bulk message failed: ' + data.error);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        addToLog('Error sending bulk message: ' + error.message);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -352,7 +298,7 @@ export default function WhatsAppPage() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">WhatsApp Integration</h1>
-            <p className="text-gray-600">Manage WhatsApp connection and send bulk messages</p>
+            <p className="text-gray-600">Manage WhatsApp connection</p>
           </div>
           <div className="flex items-center space-x-4">
             <button
@@ -454,14 +400,6 @@ export default function WhatsAppPage() {
                 {status.connectionState === 'READY' && (
                   <>
                     <button
-                      onClick={() => setShowBulkMessage(true)}
-                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Send className="h-4 w-4 mr-2" />
-                      Send Bulk Message
-                    </button>
-
-                    <button
                       onClick={() => {
                         setShowSessions(true);
                         fetchSessionInfo();
@@ -529,7 +467,6 @@ export default function WhatsAppPage() {
               <div className="space-y-2 text-sm text-blue-800">
                 <p>• Click "Connect WhatsApp" to start the connection process</p>
                 <p>• A QR code will appear that you need to scan with your WhatsApp</p>
-                <p>• Once connected, you can send bulk messages to multiple users</p>
                 <p>• Use "Disconnect" to temporarily disconnect while keeping auth</p>
                 <p>• Use "Force Logout" to completely clear auth and connect different account</p>
                 <p>• Sessions are automatically cleared when disconnecting</p>
@@ -659,66 +596,6 @@ export default function WhatsAppPage() {
                   Close
                 </button>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Bulk Message Modal */}
-        {showBulkMessage && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <h3 className="text-lg font-semibold mb-4">Send Bulk Message</h3>
-
-              <form onSubmit={handleBulkMessage} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Phone Numbers (one per line)
-                  </label>
-                  <textarea
-                    value={bulkMessageData.phoneNumbers}
-                    onChange={(e) => setBulkMessageData(prev => ({
-                      ...prev,
-                      phoneNumbers: e.target.value
-                    }))}
-                    rows={5}
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                    placeholder={`+6281234567890\n+6287654321098\n+6285555555555`}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Message</label>
-                  <textarea
-                    value={bulkMessageData.message}
-                    onChange={(e) => setBulkMessageData(prev => ({
-                      ...prev,
-                      message: e.target.value
-                    }))}
-                    rows={4}
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                    placeholder="Enter your message here..."
-                    required
-                  />
-                </div>
-
-                <div className="flex space-x-3">
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    {isLoading ? 'Sending...' : 'Send Messages'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowBulkMessage(false)}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
             </div>
           </div>
         )}

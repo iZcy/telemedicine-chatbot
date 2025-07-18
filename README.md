@@ -217,7 +217,6 @@ GET /api/stats/knowledge-gaps
 ```bash
 POST /api/whatsapp/initialize
 GET /api/whatsapp/status
-POST /api/whatsapp/bulk-message
 ```
 
 ## 🧪 Testing
