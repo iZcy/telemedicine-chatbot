@@ -44,9 +44,9 @@ npm run build
 
 echo "⚡ Starting servers with PM2..."
 
-# Create PM2 ecosystem for both frontend and backend
-cat > ecosystem.config.cjs << 'EOF'
-module.exports = {
+# Create PM2 ecosystem file with proper ES module format
+cat > ecosystem.config.js << 'EOF'
+export default {
   apps: [
     {
       name: 'telemedicine-frontend',
@@ -88,7 +88,7 @@ pm2 stop all 2>/dev/null || true
 pm2 delete all 2>/dev/null || true
 
 # Start both frontend and backend
-pm2 start ecosystem.config.cjs
+pm2 start ecosystem.config.js
 pm2 save
 pm2 startup
 
