@@ -51,18 +51,28 @@ export async function searchKnowledge(
 
 export async function logKnowledgeGap(query: string): Promise<void> {
   try {
-    await prisma.knowledgeGap.upsert({
-      where: { query },
-      update: {
-        frequency: { increment: 1 },
-        updatedAt: new Date()
-      },
-      create: {
-        query,
-        frequency: 1,
-        needsContent: true
-      }
+    // Use findFirst + create instead of upsert with non-unique field
+    const existing = await prisma.knowledgeGap.findFirst({
+      where: { query }
     });
+
+    if (existing) {
+      await prisma.knowledgeGap.update({
+        where: { id: existing.id },
+        data: {
+          frequency: { increment: 1 },
+          updatedAt: new Date()
+        }
+      });
+    } else {
+      await prisma.knowledgeGap.create({
+        data: {
+          query,
+          frequency: 1,
+          needsContent: true
+        }
+      });
+    }
   } catch (error) {
     console.error("Knowledge gap logging error:", error);
   }

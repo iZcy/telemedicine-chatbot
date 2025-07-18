@@ -10,7 +10,7 @@ whatsappRouter.use(authenticateToken);
 whatsappRouter.use(requireAdmin);
 
 // Initialize WhatsApp service
-whatsappRouter.post("/initialize", async (req, res) => {
+whatsappRouter.post("/initialize", async (_req, res) => {
   try {
     console.log("🚀 WhatsApp initialization requested by admin");
     await whatsappService.initialize();
@@ -23,13 +23,13 @@ whatsappRouter.post("/initialize", async (req, res) => {
     console.error("WhatsApp initialization error:", error);
     res.status(500).json({
       error: "Failed to initialize WhatsApp service",
-      details: error.message
+      details: error instanceof Error ? error.message : "Unknown error"
     });
   }
 });
 
 // Get detailed WhatsApp status including QR code
-whatsappRouter.get("/status", async (req, res) => {
+whatsappRouter.get("/status", async (_req, res) => {
   try {
     const basicStatus = whatsappService.getStatus();
     const detailedStatus = whatsappService.getDetailedStatus();
@@ -146,14 +146,14 @@ whatsappRouter.post("/bulk-message", async (req, res) => {
     console.error("Bulk message error:", error);
     res.status(500).json({
       error: "Failed to send bulk messages",
-      details: error.message,
+      details: error instanceof Error ? error.message : "Unknown error",
       currentState: whatsappService.getConnectionState()
     });
   }
 });
 
 // Disconnect WhatsApp
-whatsappRouter.post("/disconnect", async (req, res) => {
+whatsappRouter.post("/disconnect", async (_req, res) => {
   try {
     console.log("🔌 WhatsApp disconnection requested by admin");
     await whatsappService.disconnect();
@@ -165,13 +165,13 @@ whatsappRouter.post("/disconnect", async (req, res) => {
     console.error("WhatsApp disconnect error:", error);
     res.status(500).json({
       error: "Failed to disconnect WhatsApp service",
-      details: error.message
+      details: error instanceof Error ? error.message : "Unknown error"
     });
   }
 });
 
 // Get connection logs
-whatsappRouter.get("/logs", async (req, res) => {
+whatsappRouter.get("/logs", async (_req, res) => {
   try {
     const logs = whatsappService.getConnectionLogs();
     res.json({
@@ -218,7 +218,7 @@ whatsappRouter.post("/test", async (req, res) => {
     console.error("WhatsApp test error:", error);
     res.status(500).json({
       error: "Failed to send test message",
-      details: error.message,
+      details: error instanceof Error ? error.message : "Unknown error",
       currentState: whatsappService.getConnectionState()
     });
   }
@@ -262,7 +262,7 @@ whatsappRouter.post("/validate-numbers", async (req, res) => {
           original: phoneNumber,
           formatted: null,
           isValid: false,
-          reason: error.message
+          reason: error instanceof Error ? error.message : "Unknown error"
         });
       }
     }
@@ -285,7 +285,8 @@ whatsappRouter.post("/validate-numbers", async (req, res) => {
     console.error("Phone validation error:", error);
     res.status(500).json({
       error: "Failed to validate phone numbers",
-      details: error.message
+      // instance of
+      details: error instanceof Error ? error.message : "Unknown error"
     });
   }
 });

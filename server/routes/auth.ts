@@ -215,7 +215,7 @@ authRouter.get("/me", async (req, res) => {
     res.json({ user });
   } catch (error) {
     console.error("Get user error:", error);
-    if (error.name === "JsonWebTokenError") {
+    if (error instanceof jwt.JsonWebTokenError) {
       return res.status(403).json({ error: "Invalid token" });
     }
     res.status(500).json({ error: "Internal server error" });
@@ -223,6 +223,6 @@ authRouter.get("/me", async (req, res) => {
 });
 
 // Logout route (optional - mainly for consistency)
-authRouter.post("/logout", (req, res) => {
+authRouter.post("/logout", (_req, res) => {
   res.json({ message: "Logout successful" });
 });

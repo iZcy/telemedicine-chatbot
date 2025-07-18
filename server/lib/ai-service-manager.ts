@@ -71,17 +71,19 @@ class AIServiceManager {
       return {
         response: fallbackMessage,
         provider: "deepseek",
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       };
     }
   }
 
   private getFallbackMessage(error: any): string {
-    if (error.message?.includes("rate limit")) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    if (errorMessage.includes("rate limit")) {
       return "Saya sedang mengalami beban tinggi. Silakan coba lagi dalam beberapa menit.";
     }
 
-    if (error.message?.includes("timeout")) {
+    if (errorMessage.includes("timeout")) {
       return "Permintaan memakan waktu lebih lama dari yang diharapkan. Silakan coba lagi dengan pertanyaan yang lebih singkat.";
     }
 
@@ -94,8 +96,10 @@ class AIServiceManager {
   }> {
     const testMessage: ChatMessage[] = [{ role: "user", content: "Halo" }];
 
-    const results = {
-      deepseek: { status: "error" as const, latency: undefined }
+    const results: {
+      deepseek: { status: "ok" | "error"; latency?: number };
+    } = {
+      deepseek: { status: "error" }
     };
 
     try {
@@ -103,7 +107,9 @@ class AIServiceManager {
       await this.callDeepSeek(testMessage, { temperature: 0.1, maxTokens: 10 });
       results.deepseek = { status: "ok", latency: Date.now() - start };
     } catch (error) {
-      console.error("DeepSeek health check failed:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("DeepSeek health check failed:", errorMessage);
     }
 
     return results;

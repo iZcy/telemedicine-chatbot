@@ -48,12 +48,12 @@ app.use("/api/whatsapp", whatsappRouter);
 app.use("/health", healthRouter);
 
 // Legacy health check (for backward compatibility)
-app.get("/health", (req, res) => {
+app.get("/health", (_req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
 // Root endpoint
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.json({
     message: "Chatbot Medis Telemedicine API",
     version: "1.0.0",
@@ -75,9 +75,9 @@ app.get("/", (req, res) => {
 app.use(
   (
     err: any,
-    req: express.Request,
+    _req: express.Request,
     res: express.Response,
-    next: express.NextFunction
+    _next: express.NextFunction
   ) => {
     console.error("Error:", err);
 
@@ -93,7 +93,7 @@ app.use(
 );
 
 // 404 handler
-app.use("*", (req, res) => {
+app.use("*", (_req, res) => {
   res.status(404).json({
     error: "Endpoint tidak ditemukan",
     timestamp: new Date().toISOString(),

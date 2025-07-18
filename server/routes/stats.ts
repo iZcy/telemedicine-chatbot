@@ -9,7 +9,7 @@ export const statsRouter = Router();
 statsRouter.use(authenticateToken);
 
 // Dashboard stats (admin only)
-statsRouter.get("/dashboard", requireAdmin, async (req, res) => {
+statsRouter.get("/dashboard", requireAdmin, async (_req, res) => {
   try {
     const stats = await statsService.getDashboardStats();
     res.json(stats);
@@ -44,7 +44,7 @@ statsRouter.get("/knowledge-gaps", requireAdmin, async (req, res) => {
 });
 
 // Response quality (admin only)
-statsRouter.get("/response-quality", requireAdmin, async (req, res) => {
+statsRouter.get("/response-quality", requireAdmin, async (_req, res) => {
   try {
     const quality = await statsService.getResponseQuality();
     res.json(quality);
@@ -67,7 +67,7 @@ statsRouter.get("/top-queries", requireAdmin, async (req, res) => {
 });
 
 // Category distribution (admin only)
-statsRouter.get("/categories", requireAdmin, async (req, res) => {
+statsRouter.get("/categories", requireAdmin, async (_req, res) => {
   try {
     const categories = await statsService.getCategoryDistribution();
     res.json(categories);

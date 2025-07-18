@@ -5,7 +5,7 @@ import { aiServiceManager } from "../lib/ai-service-manager";
 export const healthRouter = Router();
 
 // Basic health check
-healthRouter.get("/", (req, res) => {
+healthRouter.get("/", (_req, res) => {
   res.json({
     status: "OK",
     timestamp: new Date().toISOString(),
@@ -14,7 +14,7 @@ healthRouter.get("/", (req, res) => {
 });
 
 // AI services health check
-healthRouter.get("/ai", async (req, res) => {
+healthRouter.get("/ai", async (_req, res) => {
   try {
     const healthStatus = await aiServiceManager.healthCheck();
 
@@ -44,7 +44,7 @@ healthRouter.get("/ai", async (req, res) => {
 });
 
 // Detailed system status
-healthRouter.get("/status", async (req, res) => {
+healthRouter.get("/status", async (_req, res) => {
   try {
     const healthStatus = await aiServiceManager.healthCheck();
 

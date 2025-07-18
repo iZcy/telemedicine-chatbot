@@ -72,7 +72,9 @@ export default function WhatsAppPage() {
       }
     } catch (error) {
       console.error('Error fetching WhatsApp status:', error);
-      addToLog('Error fetching status: ' + error.message);
+      if (error instanceof Error) {
+        addToLog('Error fetching status: ' + error.message);
+      }
     }
   };
 
@@ -134,7 +136,9 @@ export default function WhatsAppPage() {
         });
       }
     } catch (error) {
-      addToLog('Error disconnecting: ' + error.message);
+      if (error instanceof Error) {
+        addToLog('Error disconnecting: ' + error.message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -171,7 +175,9 @@ export default function WhatsAppPage() {
         setShowBulkMessage(false);
       }
     } catch (error) {
-      addToLog('Error sending bulk message: ' + error.message);
+      if (error instanceof Error) {
+        addToLog('Error sending bulk message: ' + error.message);
+      }
     } finally {
       setIsLoading(false);
     }

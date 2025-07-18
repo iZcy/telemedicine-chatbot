@@ -227,13 +227,13 @@ async function processMessageAsync(
     });
 
     // Save bot response
-    const savedBotMessage = await prisma.chatMessage.create({
-      data: {
-        sessionId: session.id,
-        senderType: "BOT",
-        content: botResponse
-      }
-    });
+    // const savedBotMessage = await prisma.chatMessage.create({
+    //   data: {
+    //     sessionId: session.id,
+    //     senderType: "BOT",
+    //     content: botResponse
+    //   }
+    // });
 
     // Update session context
     await prisma.chatSession.update({
@@ -274,7 +274,7 @@ async function processMessageAsync(
 // Helper function to get processed response (you'll need to implement this)
 async function getProcessedResponse(
   sessionId: string,
-  messageId: string
+  _messageId: string
 ): Promise<any> {
   try {
     // Get the latest bot message for this session

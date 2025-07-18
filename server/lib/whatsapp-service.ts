@@ -1,4 +1,4 @@
-// server/lib/whatsapp-service.ts - Fixed version with better error handling
+// server/lib/whatsapp-service.ts - Fixed TypeScript version
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth } = pkg;
 import qrcode from "qrcode-terminal";
@@ -55,7 +55,7 @@ export class WhatsAppService {
   }
 
   private setupEventListeners() {
-    this.client.on("qr", (qr) => {
+    this.client.on("qr", (qr: string) => {
       console.log("📱 QR Code received, please scan with WhatsApp:");
 
       // Display QR in terminal for debugging
@@ -83,7 +83,7 @@ export class WhatsAppService {
       this.addToLog("Authentication successful");
     });
 
-    this.client.on("auth_failure", (msg) => {
+    this.client.on("auth_failure", (msg: string) => {
       console.error("❌ WhatsApp authentication failed:", msg);
       this.connectionState = "ERROR";
       this.lastError = `Authentication failed: ${msg}`;
@@ -91,7 +91,7 @@ export class WhatsAppService {
       this.addToLog(`Authentication failed: ${msg}`);
     });
 
-    this.client.on("disconnected", (reason) => {
+    this.client.on("disconnected", (reason: string) => {
       console.log("📱 WhatsApp disconnected:", reason);
       this.connectionState = "DISCONNECTED";
       this.currentQRCode = null;
@@ -100,7 +100,7 @@ export class WhatsAppService {
       this.addToLog(`Disconnected: ${reason}`);
     });
 
-    this.client.on("loading_screen", (percent, message) => {
+    this.client.on("loading_screen", (percent: number, message: string) => {
       console.log(`⏳ Loading: ${percent}% - ${message}`);
       this.addToLog(`Loading: ${percent}% - ${message}`);
     });
@@ -156,75 +156,80 @@ export class WhatsAppService {
       await this.client.initialize();
       this.addToLog("WhatsApp service initialized");
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       console.error("Failed to initialize WhatsApp service:", error);
       this.connectionState = "ERROR";
-      this.lastError = error.message;
+      this.lastError = errorMessage;
       this.isInitializing = false;
-      this.addToLog(`Initialization failed: ${error.message}`);
+      this.addToLog(`Initialization failed: ${errorMessage}`);
       throw error;
     }
   }
 
   // Phone number validation and formatting
-  private formatPhoneNumber(phoneNumber: string): string {
-    // Remove all non-numeric characters except +
-    let cleaned = phoneNumber.replace(/[^\d+]/g, "");
+  // private formatPhoneNumber(phoneNumber: string): string {
+  //   // Remove all non-numeric characters except +
+  //   let cleaned = phoneNumber.replace(/[^\d+]/g, "");
 
-    // If it starts with +, keep it
-    if (cleaned.startsWith("+")) {
-      return cleaned;
-    }
+  //   // If it starts with +, keep it
+  //   if (cleaned.startsWith("+")) {
+  //     return cleaned;
+  //   }
 
-    // If it starts with 0, replace with +62 (Indonesia)
-    if (cleaned.startsWith("0")) {
-      return "+62" + cleaned.substring(1);
-    }
+  //   // If it starts with 0, replace with +62 (Indonesia)
+  //   if (cleaned.startsWith("0")) {
+  //     return "+62" + cleaned.substring(1);
+  //   }
 
-    // If it starts with 62, add +
-    if (cleaned.startsWith("62")) {
-      return "+" + cleaned;
-    }
+  //   // If it starts with 62, add +
+  //   if (cleaned.startsWith("62")) {
+  //     return "+" + cleaned;
+  //   }
 
-    // If it doesn't have country code, assume Indonesia
-    if (cleaned.length >= 10 && !cleaned.startsWith("62")) {
-      return "+62" + cleaned;
-    }
+  //   // If it doesn't have country code, assume Indonesia
+  //   if (cleaned.length >= 10 && !cleaned.startsWith("62")) {
+  //     return "+62" + cleaned;
+  //   }
 
-    return "+" + cleaned;
-  }
+  //   return "+" + cleaned;
+  // }
 
-  private async validatePhoneNumber(phoneNumber: string): Promise<boolean> {
-    try {
-      const formattedNumber = this.formatPhoneNumber(phoneNumber);
-      const numberId = await this.client.getNumberId(formattedNumber);
-      return numberId && numberId.exists;
-    } catch (error) {
-      console.log(
-        `Phone number validation failed for ${phoneNumber}:`,
-        error.message
-      );
-      return false;
-    }
-  }
+  // Remove unused method or implement it
+  // private async validatePhoneNumber(phoneNumber: string): Promise<boolean> {
+  //   try {
+  //     const formattedNumber = this.formatPhoneNumber(phoneNumber);
+  //     const numberId = await this.client.getNumberId(formattedNumber);
+  //     return numberId && numberId.exists;
+  //   } catch (error) {
+  //     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  //     console.log(
+  //       `Phone number validation failed for ${phoneNumber}:`,
+  //       errorMessage
+  //     );
+  //     return false;
+  //   }
+  // }
 
-  private async waitForConnection(maxWaitMs: number = 30000): Promise<boolean> {
-    const startTime = Date.now();
+  // Remove unused method or implement it
+  // private async waitForConnection(maxWaitMs: number = 30000): Promise<boolean> {
+  //   const startTime = Date.now();
 
-    while (Date.now() - startTime < maxWaitMs) {
-      if (this.connectionState === "READY") {
-        return true;
-      }
-      if (
-        this.connectionState === "ERROR" ||
-        this.connectionState === "DISCONNECTED"
-      ) {
-        return false;
-      }
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
+  //   while (Date.now() - startTime < maxWaitMs) {
+  //     if (this.connectionState === "READY") {
+  //       return true;
+  //     }
+  //     if (
+  //       this.connectionState === "ERROR" ||
+  //       this.connectionState === "DISCONNECTED"
+  //     ) {
+  //       return false;
+  //     }
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
+  //   }
 
-    return false;
-  }
+  //   return false;
+  // }
 
   private async handleMessage(message: any) {
     // Ignore messages from status and groups
@@ -266,8 +271,10 @@ export class WhatsAppService {
       await this.sendMessage(phoneNumber, response);
       this.addToLog(`Response sent to ${phoneNumber.substring(0, 10)}...`);
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       console.error("Error handling WhatsApp message:", error);
-      this.addToLog(`Error handling message: ${error.message}`);
+      this.addToLog(`Error handling message: ${errorMessage}`);
       try {
         await this.sendMessage(
           phoneNumber,
@@ -388,7 +395,9 @@ export class WhatsAppService {
       }
     } catch (error) {
       // Typing indicator is optional, don't fail the main flow
-      console.log("Typing indicator not supported or failed:", error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.log("Typing indicator not supported or failed:", errorMessage);
     }
   }
 
@@ -556,25 +565,13 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
     }
 
     try {
-      // // Format the phone number properly
-      // const selfFormattedNumber = this.formatPhoneNumber(phoneNumber);
-
-      // // Validate the number exists on WhatsApp
-      // const numberId = await this.client.getNumberId(selfFormattedNumber);
-      // if (!numberId || !numberId.exists) {
-      //   throw new Error(
-      //     `Phone number ${selfFormattedNumber} does not exist on WhatsApp`
-      //   );
-      // }
-
       // Send the message
       await this.client.sendMessage(phoneNumber, message);
-      // console.log(
-      //   `📤 Message sent to ${formattedNumber}: ${message.substring(0, 50)}...`
-      // );
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       console.error("Failed to send WhatsApp message:", error);
-      throw new Error(`Failed to send message: ${error.message}`);
+      throw new Error(`Failed to send message: ${errorMessage}`);
     }
   }
 
@@ -598,9 +595,6 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
       const phoneNumber = phoneNumbers[i];
 
       try {
-        // Format and validate phone number
-        // const formattedNumber = this.formatPhoneNumber(phoneNumber);
-
         await this.sendMessage(phoneNumber, message);
         results.success++;
         this.addToLog(
@@ -616,7 +610,9 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
         }
       } catch (error) {
         results.failed++;
-        const errorMsg = `Failed to send to ${phoneNumber}: ${error.message}`;
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
+        const errorMsg = `Failed to send to ${phoneNumber}: ${errorMessage}`;
         results.errors.push(errorMsg);
         this.addToLog(`❌ ${errorMsg}`);
 
@@ -702,8 +698,10 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
       // Reinitialize client for next connection
       this.initializeClient();
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       console.error("Error during disconnect:", error);
-      this.addToLog(`Disconnect error: ${error.message}`);
+      this.addToLog(`Disconnect error: ${errorMessage}`);
       throw error;
     }
   }
