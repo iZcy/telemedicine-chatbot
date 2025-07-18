@@ -11,6 +11,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    allowedHosts: ["telemedicine.kecamatanbayan.id"],
     proxy: {
       "/api": {
         target: "http://localhost:3001",
