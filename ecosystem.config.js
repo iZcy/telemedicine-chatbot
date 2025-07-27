@@ -7,7 +7,7 @@ module.exports = {
       name: 'telemedicine-chatbot',
       script: 'tsx',
       args: 'server/index.ts',
-      cwd: '/home/izcy/Desktop/UGM/KKN/proj/chatbot-telemedicine',
+      cwd: '/var/www/telemedicine-chatbot',
       instances: 1,
       exec_mode: 'fork',
       
