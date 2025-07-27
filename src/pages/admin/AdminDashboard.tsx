@@ -1,7 +1,7 @@
 // src/pages/admin/AdminDashboard.tsx - Updated with WhatsApp link
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Database, MessageSquare, BarChart3, Settings, Bot, LogOut, Users, TrendingUp, Smartphone } from 'lucide-react';
+import { Database, MessageSquare, BarChart3, Settings, Bot, LogOut, Users, TrendingUp, Smartphone, AlertTriangle } from 'lucide-react';
 import AIServiceStatus from '@/components/admin/AIServiceStatus';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -29,6 +29,7 @@ export default function AdminDashboard() {
     averageResponseTime: 0
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [isFixingStats, setIsFixingStats] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -58,6 +59,39 @@ export default function AdminDashboard() {
       await logout();
     } catch (error) {
       console.error('Logout failed:', error);
+    }
+  };
+
+  const fixStatistics = async () => {
+    if (isFixingStats) return;
+    
+    setIsFixingStats(true);
+    try {
+      const response = await fetch('/api/stats/fix-user-ids', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Statistics fixed:', result);
+        
+        // Refresh stats after fixing
+        await fetchStats();
+        
+        // Show success message (you could add a toast notification here)
+        alert(`Statistics have been updated!\nActive Users: ${result.currentStats.activeUsers}\nAverage Response Time: ${result.currentStats.averageResponseTime}s`);
+      } else {
+        console.error('Failed to fix statistics');
+        alert('Failed to fix statistics. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error fixing statistics:', error);
+      alert('Error occurred while fixing statistics.');
+    } finally {
+      setIsFixingStats(false);
     }
   };
 
@@ -94,13 +128,23 @@ export default function AdminDashboard() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard Admin</h1>
             <p className="text-gray-600">Kelola sistem chatbot medis telemedicine Anda</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Keluar
-          </button>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={fetchStats}
+              disabled={isLoading}
+              className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+            >
+              <TrendingUp className="h-4 w-4 mr-2" />
+              {isLoading ? 'Memuat...' : 'Refresh'}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Keluar
+            </button>
+          </div>
         </div>
 
         {/* AI Service Status */}
@@ -155,20 +199,22 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Settings className="h-8 w-8 text-red-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Celah Pengetahuan</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.knowledgeGaps}</p>
+          <Link to="/admin/knowledge-gaps">
+            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <AlertTriangle className="h-8 w-8 text-orange-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Celah Pengetahuan</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.knowledgeGaps}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-500">Perlu Ditambahkan</p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-xs text-gray-500">Perlu Ditambahkan</p>
-              </div>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Today's Activity */}
@@ -193,6 +239,15 @@ export default function AdminDashboard() {
             </div>
             <p className="text-3xl font-bold text-gray-900 mb-2">{stats.activeUsers}</p>
             <p className="text-sm text-gray-500">7 hari terakhir</p>
+            {stats.activeUsers === 0 && (
+              <button
+                onClick={fixStatistics}
+                disabled={isFixingStats}
+                className="mt-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 disabled:opacity-50"
+              >
+                {isFixingStats ? 'Memperbarui...' : 'Perbaiki Statistik'}
+              </button>
+            )}
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
@@ -205,7 +260,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Main Actions - Updated to include WhatsApp */}
+        {/* Main Actions - Updated to include WhatsApp and Knowledge Gaps */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-gray-900">
           <Link to="/admin/knowledge" className="block">
             <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
@@ -217,6 +272,19 @@ export default function AdminDashboard() {
                 Kelola entri pengetahuan medis, kategori, dan alur kerja persetujuan konten.
               </p>
               <div className="text-blue-600 font-medium">Kelola Pengetahuan →</div>
+            </div>
+          </Link>
+
+          <Link to="/admin/knowledge-gaps" className="block">
+            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-center mb-4">
+                <AlertTriangle className="h-6 w-6 text-orange-600" />
+                <h2 className="text-xl font-semibold ml-2">Celah Pengetahuan</h2>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Kelola pertanyaan tanpa jawaban dan buat konten pengetahuan baru.
+              </p>
+              <div className="text-orange-600 font-medium">Kelola Celah →</div>
             </div>
           </Link>
 

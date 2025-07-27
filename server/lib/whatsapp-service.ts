@@ -513,6 +513,7 @@ export class WhatsAppService {
       session = await prisma.chatSession.create({
         data: {
           id: sessionId,
+          anonymousId: phoneNumber, // Use phone number as anonymousId for WhatsApp users
           context: {
             symptoms: [],
             conversationStage: "greeting",

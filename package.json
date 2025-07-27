@@ -15,7 +15,10 @@
     "health:check": "curl http://localhost:3001/health/ai",
     "test:ai": "node -e \"import('./server/lib/ai-service-manager.js').then(m => m.aiServiceManager.healthCheck().then(console.log))\"",
     "whatsapp:init": "node -e \"import('./server/lib/whatsapp-service.js').then(m => m.whatsappService.initialize())\"",
-    "stats:demo": "node -e \"import('./server/lib/stats-service.js').then(m => m.statsService.getDashboardStats().then(console.log))\""
+    "stats:demo": "node -e \"import('./server/lib/stats-service.js').then(m => m.statsService.getDashboardStats().then(console.log))\"",
+    "reset:deployment": "./scripts/reset-deployment.sh",
+    "backup:database": "./scripts/backup-database.sh",
+    "reset:docker": "./scripts/docker-reset.sh"
   },
   "dependencies": {
     "@prisma/client": "^5.6.0",

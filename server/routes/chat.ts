@@ -103,6 +103,7 @@ chatRouter.post("/", async (req, res) => {
       session = await prisma.chatSession.create({
         data: {
           id: sessionId,
+          anonymousId: sessionId, // Use sessionId as anonymousId for tracking web users
           context: {
             symptoms: [],
             conversationStage: "greeting",
@@ -250,6 +251,7 @@ async function processMessageAsync(
       session = await prisma.chatSession.create({
         data: {
           id: sessionId,
+          anonymousId: sessionId, // Use sessionId as anonymousId for tracking web users
           context: {
             symptoms: [],
             conversationStage: "greeting",

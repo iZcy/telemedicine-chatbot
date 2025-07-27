@@ -94,20 +94,38 @@ export class StatsService {
       })
     ]);
 
-    // Active users (users who chatted in last 7 days) - using groupBy instead of distinct
-    const activeUsersData = await prisma.chatSession.groupBy({
-      by: ["userId"],
-      where: {
-        startedAt: {
-          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-        },
-        userId: {
-          not: null
-        }
-      }
-    });
+    // Fix any sessions that don't have anonymousId set (migrate existing data)
+    await this.fixMissingAnonymousIds();
 
-    const activeUsers = activeUsersData.length;
+    // Active users (users who chatted in last 7 days) - count both registered and anonymous users
+    const [registeredUsers, anonymousUsers] = await Promise.all([
+      // Registered users
+      prisma.chatSession.groupBy({
+        by: ["userId"],
+        where: {
+          startedAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          },
+          userId: {
+            not: null
+          }
+        }
+      }),
+      // Anonymous users (web sessions, WhatsApp users)
+      prisma.chatSession.groupBy({
+        by: ["anonymousId"],
+        where: {
+          startedAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          },
+          anonymousId: {
+            not: null
+          }
+        }
+      })
+    ]);
+
+    const activeUsers = registeredUsers.length + anonymousUsers.length;
 
     // Calculate average response time (simplified)
     const averageResponseTime = await this.getAverageResponseTime();
@@ -260,9 +278,58 @@ export class StatsService {
   }
 
   private async getAverageResponseTime(): Promise<number> {
-    // This is a simplified calculation
-    // In a real implementation, you'd track actual response times
-    return 2.5; // seconds
+    try {
+      // Get recent chat messages to calculate response times
+      const recentSessions = await prisma.chatSession.findMany({
+        where: {
+          startedAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
+          }
+        },
+        include: {
+          messages: {
+            orderBy: { timestamp: 'asc' },
+            take: 20 // Limit to avoid performance issues
+          }
+        },
+        take: 100 // Limit sessions for performance
+      });
+
+      const responseTimes: number[] = [];
+
+      recentSessions.forEach(session => {
+        const messages = session.messages;
+        
+        for (let i = 0; i < messages.length - 1; i++) {
+          const userMessage = messages[i];
+          const botMessage = messages[i + 1];
+          
+          // Check if it's a user message followed by a bot message
+          if (userMessage.senderType === 'USER' && botMessage.senderType === 'BOT') {
+            const responseTime = (new Date(botMessage.timestamp).getTime() - 
+                                 new Date(userMessage.timestamp).getTime()) / 1000; // Convert to seconds
+            
+            // Only include reasonable response times (between 0.1 and 30 seconds)
+            if (responseTime > 0.1 && responseTime < 30) {
+              responseTimes.push(responseTime);
+            }
+          }
+        }
+      });
+
+      if (responseTimes.length === 0) {
+        return 2.5; // Default fallback
+      }
+
+      // Calculate average response time
+      const averageTime = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
+      
+      // Round to 1 decimal place
+      return Math.round(averageTime * 10) / 10;
+    } catch (error) {
+      console.error('Error calculating response time:', error);
+      return 2.5; // Fallback value
+    }
   }
 
   async recordQueryMatch(
@@ -289,6 +356,59 @@ export class StatsService {
       where: { id: queryMatchId },
       data: { wasHelpful }
     });
+  }
+
+  // Fix existing chat sessions that don't have anonymousId set
+  private async fixMissingAnonymousIds(): Promise<void> {
+    try {
+      // Find sessions without anonymousId
+      const sessionsWithoutAnonymousId = await prisma.chatSession.findMany({
+        where: {
+          anonymousId: null
+        },
+        select: {
+          id: true,
+          context: true
+        }
+      });
+
+      if (sessionsWithoutAnonymousId.length === 0) {
+        return; // No sessions to fix
+      }
+
+      console.log(`🔧 Fixing ${sessionsWithoutAnonymousId.length} sessions without anonymousId`);
+
+      // Update sessions in batches
+      const batchSize = 50;
+      for (let i = 0; i < sessionsWithoutAnonymousId.length; i += batchSize) {
+        const batch = sessionsWithoutAnonymousId.slice(i, i + batchSize);
+        
+        const updatePromises = batch.map(session => {
+          const context = session.context as any;
+          
+          // For WhatsApp sessions, use phone number if available
+          if (context?.platform === 'whatsapp' && context?.userInfo?.phone) {
+            return prisma.chatSession.update({
+              where: { id: session.id },
+              data: { anonymousId: context.userInfo.phone }
+            });
+          } else {
+            // For web sessions, use sessionId as anonymousId
+            return prisma.chatSession.update({
+              where: { id: session.id },
+              data: { anonymousId: session.id }
+            });
+          }
+        });
+
+        await Promise.all(updatePromises);
+      }
+
+      console.log(`✅ Fixed ${sessionsWithoutAnonymousId.length} sessions with missing anonymousId`);
+    } catch (error) {
+      console.error('Error fixing missing anonymousIds:', error);
+      // Don't throw error to avoid breaking stats calculation
+    }
   }
 }
 

@@ -60,6 +60,7 @@ model KnowledgeVersion {
 model ChatSession {
   id        String   @id @default(cuid())
   userId    String?
+  anonymousId String? // For tracking anonymous users (phone numbers, session IDs)
   startedAt DateTime @default(now())
   endedAt   DateTime?
   status    SessionStatus @default(ACTIVE)
@@ -97,7 +98,7 @@ model QueryMatch {
   createdAt     DateTime       @default(now())
 
   // Relations
-  entry         KnowledgeEntry @relation(fields: [entryId], references: [id])
+  entry         KnowledgeEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
 
   @@map("query_matches")
 }
@@ -107,8 +108,15 @@ model KnowledgeGap {
   query     String
   frequency Int      @default(1)
   needsContent Boolean @default(true)
+  status    GapStatus?
+  assignedTo String?
+  resolvedBy String?
+  resolvedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations can be added later if needed
+  // For now, we'll track resolution without direct relations
 
   @@map("knowledge_gaps")
 }
@@ -134,4 +142,10 @@ enum SessionStatus {
 enum SenderType {
   USER
   BOT
+}
+
+enum GapStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
 }

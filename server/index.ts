@@ -10,7 +10,9 @@ import { healthRouter } from "./routes/health";
 import { authRouter } from "./routes/auth";
 import { statsRouter } from "./routes/stats";
 import { whatsappRouter } from "./routes/whatsapp";
+import { knowledgeGapsRouter } from "./routes/knowledge-gaps";
 import { whatsappService } from "./lib/whatsapp-service";
+import { gapEvaluationService } from "./lib/gap-evaluation-service";
 
 dotenv.config();
 
@@ -43,6 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/knowledge", knowledgeRouter);
+app.use("/api/knowledge-gaps", knowledgeGapsRouter);
 app.use("/api/stats", statsRouter);
 app.use("/api/whatsapp", whatsappRouter);
 app.use("/health", healthRouter);
@@ -110,8 +113,9 @@ app.use("*", (_req, res) => {
   });
 });
 
-// Initialize WhatsApp service if enabled
+// Initialize services
 async function initializeServices() {
+  // Initialize WhatsApp service if enabled
   if (process.env.ENABLE_WHATSAPP === "true") {
     try {
       console.log("🟢 Initializing WhatsApp service...");
@@ -121,6 +125,29 @@ async function initializeServices() {
       console.error("❌ Failed to initialize WhatsApp service:", error);
       console.log("📱 WhatsApp service will be disabled");
     }
+  }
+
+  // Initialize gap evaluation service
+  try {
+    console.log("🔍 Initializing gap evaluation service...");
+    
+    // Start periodic evaluation every 6 hours
+    gapEvaluationService.startPeriodicEvaluation(6);
+    
+    // Run initial evaluation after 5 minutes (allow server to fully start)
+    setTimeout(async () => {
+      try {
+        console.log("🚀 Running initial gap evaluation...");
+        const result = await gapEvaluationService.evaluateAllOpenGaps();
+        console.log(`📊 Initial evaluation: ${result.resolved}/${result.evaluated} gaps resolved`);
+      } catch (error) {
+        console.error("Initial gap evaluation error:", error);
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+
+    console.log("✅ Gap evaluation service initialized successfully");
+  } catch (error) {
+    console.error("❌ Failed to initialize gap evaluation service:", error);
   }
 }
 

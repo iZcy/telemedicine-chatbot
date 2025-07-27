@@ -94,3 +94,25 @@ statsRouter.post("/feedback/:queryMatchId", async (req, res) => {
     res.status(500).json({ error: "Failed to record feedback" });
   }
 });
+
+// Manual fix for missing anonymous IDs (admin only)
+statsRouter.post("/fix-user-ids", requireAdmin, async (_req, res) => {
+  try {
+    console.log("🔧 Manual fix for missing anonymous IDs requested");
+    
+    // Call the stats service to refresh and fix data
+    const stats = await statsService.getDashboardStats();
+    
+    res.json({ 
+      success: true, 
+      message: "Anonymous IDs have been fixed and statistics refreshed",
+      currentStats: {
+        activeUsers: stats.activeUsers,
+        averageResponseTime: stats.averageResponseTime
+      }
+    });
+  } catch (error) {
+    console.error("Fix anonymous IDs error:", error);
+    res.status(500).json({ error: "Failed to fix anonymous IDs" });
+  }
+});
