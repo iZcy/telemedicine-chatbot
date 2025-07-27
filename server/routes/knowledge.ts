@@ -183,6 +183,7 @@ knowledgeRouter.put("/:id", authenticateToken, requireAdmin, async (req, res) =>
 
     res.json(entry);
   } catch (error) {
+    console.error("Knowledge PUT error:", error);
     res.status(500).json({ error: "Failed to update entry" });
   }
 });
@@ -230,11 +231,11 @@ knowledgeRouter.delete("/:id", authenticateToken, requireAdmin, async (req, res)
     console.error("Knowledge entry deletion error:", error);
     
     // Provide more specific error messages
-    if (error.code === 'P2025') {
+    if ((error as any).code === 'P2025') {
       return res.status(404).json({ error: "Knowledge entry not found" });
     }
     
-    if (error.code === 'P2003') {
+    if ((error as any).code === 'P2003') {
       return res.status(400).json({ 
         error: "Cannot delete entry due to existing references. Please contact support." 
       });
@@ -242,9 +243,9 @@ knowledgeRouter.delete("/:id", authenticateToken, requireAdmin, async (req, res)
 
     // Log the full error for debugging
     console.error("Full error details:", {
-      code: error.code,
-      message: error.message,
-      meta: error.meta
+      code: (error as any).code,
+      message: error instanceof Error ? error.message : String(error),
+      meta: (error as any).meta
     });
 
     res.status(500).json({ 

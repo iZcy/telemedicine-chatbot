@@ -153,10 +153,7 @@ export class GapEvaluationService {
       console.log(`🔍 Evaluating gaps for new entry: ${entryId}`);
 
       const entry = await prisma.knowledgeEntry.findUnique({
-        where: { id: entryId },
-        include: {
-          keywords: true
-        }
+        where: { id: entryId }
       });
 
       if (!entry || !entry.medicalReviewed) {
@@ -190,10 +187,7 @@ export class GapEvaluationService {
               resolvedAt: new Date(),
               resolvedBy: 'auto-entry',
               needsContent: false,
-              updatedAt: new Date(),
-              relatedEntries: {
-                connect: { id: entryId }
-              }
+              updatedAt: new Date()
             }
           });
 
@@ -366,7 +360,7 @@ export class GapEvaluationService {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private async logGapResolution(gapId: string, query: string, matches: any[]): Promise<void> {
+  private async logGapResolution(_gapId: string, query: string, matches: any[]): Promise<void> {
     try {
       console.log(`✅ Gap resolved: "${query}" with ${matches.length} matches`);
       

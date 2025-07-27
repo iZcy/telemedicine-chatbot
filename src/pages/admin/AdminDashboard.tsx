@@ -1,7 +1,7 @@
 // src/pages/admin/AdminDashboard.tsx - Updated with WhatsApp link
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Database, MessageSquare, BarChart3, Settings, Bot, LogOut, Users, TrendingUp, Smartphone, AlertTriangle } from 'lucide-react';
+import { Database, MessageSquare, BarChart3, Bot, LogOut, Users, TrendingUp, Smartphone, AlertTriangle } from 'lucide-react';
 import AIServiceStatus from '@/components/admin/AIServiceStatus';
 import { useAuth } from '@/contexts/AuthContext';
 

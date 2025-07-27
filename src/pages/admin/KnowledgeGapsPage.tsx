@@ -1,6 +1,6 @@
 // src/pages/admin/KnowledgeGapsPage.tsx
 import { useState, useEffect } from 'react';
-import { AlertTriangle, Plus, Check, X, Clock, TrendingUp, Search } from 'lucide-react';
+import { AlertTriangle, Plus, Check, Clock, TrendingUp, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface KnowledgeGap {
@@ -10,7 +10,7 @@ interface KnowledgeGap {
   needsContent: boolean;
   createdAt: string;
   updatedAt: string;
-  status?: 'open' | 'in_progress' | 'resolved';
+  status?: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
   assignedTo?: string;
   resolvedBy?: string;
   resolvedAt?: string;

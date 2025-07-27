@@ -266,7 +266,7 @@ knowledgeGapsRouter.post("/:id/evaluate", async (req, res) => {
       await prisma.knowledgeGap.update({
         where: { id },
         data: {
-          status: 'resolved',
+          status: 'RESOLVED',
           resolvedAt: new Date(),
           needsContent: false,
           updatedAt: new Date()
@@ -300,7 +300,7 @@ knowledgeGapsRouter.post("/evaluate-all", async (_req, res) => {
     const openGaps = await prisma.knowledgeGap.findMany({
       where: {
         OR: [
-          { status: 'open' },
+          { status: 'OPEN' },
           { status: null }
         ],
         needsContent: true
@@ -319,7 +319,7 @@ knowledgeGapsRouter.post("/evaluate-all", async (_req, res) => {
           await prisma.knowledgeGap.update({
             where: { id: gap.id },
             data: {
-              status: 'resolved',
+              status: 'RESOLVED',
               resolvedAt: new Date(),
               needsContent: false,
               updatedAt: new Date()
@@ -513,7 +513,7 @@ knowledgeGapsRouter.post("/check-similarity", async (req, res) => {
 });
 
 // Helper function to log gap resolution
-async function logGapResolution(gapId: string, query: string, matches: any[]): Promise<void> {
+async function logGapResolution(_gapId: string, query: string, matches: any[]): Promise<void> {
   try {
     // You could create a separate table for gap resolutions if needed
     console.log(`✅ Gap resolved: "${query}" with ${matches.length} matches`);
