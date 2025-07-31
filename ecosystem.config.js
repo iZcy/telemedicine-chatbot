@@ -20,25 +20,61 @@ module.exports = {
       // Auto-restart settings
       autorestart: true,
       watch: false,
-      max_memory_restart: '1G',
+      max_memory_restart: '2G', // Increased from 1G to handle WhatsApp + AI services
       
-      // Logs
+      // Logs with rotation
       log_file: './logs/combined.log',
       out_file: './logs/out.log',
       error_file: './logs/error.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      log_type: 'json',
+      merge_logs: true,
       
-      // Advanced settings
-      kill_timeout: 5000,
+      // Advanced settings for better stability
+      kill_timeout: 10000, // Increased to allow graceful shutdown
       wait_ready: true,
-      listen_timeout: 10000,
+      listen_timeout: 15000, // Increased for slower startups
       
-      // Health monitoring
-      min_uptime: '10s',
-      max_restarts: 10,
+      // Health monitoring - more lenient
+      min_uptime: '30s', // Require 30s uptime before considering healthy
+      max_restarts: 5, // Reduced to prevent restart loops
+      restart_delay: 5000, // Wait 5s between restarts
       
-      // Source maps support for TypeScript
-      node_args: '--enable-source-maps'
+      // Memory and CPU limits
+      max_memory_restart: '2G',
+      node_args: '--enable-source-maps --max-old-space-size=2048',
+      
+      // Graceful shutdown
+      shutdown_with_message: true,
+      kill_retry_time: 5000,
+      
+      // Process monitoring
+      pmx: true,
+      
+      // Error handling
+      panic: false,
+      automation: false,
+      
+      // Environment-specific overrides
+      env_production: {
+        NODE_ENV: 'production',
+        PORT: 3001,
+        // Add production-specific env vars here
+      },
+      
+      env_development: {
+        NODE_ENV: 'development',
+        PORT: 3001,
+        watch: true,
+        ignore_watch: [
+          'node_modules',
+          'logs',
+          '.git',
+          '*.log',
+          'dist',
+          'build'
+        ]
+      }
     }
   ],
 
@@ -50,7 +86,9 @@ module.exports = {
       ref: 'origin/main',
       repo: 'git@github.com:your-username/telemedicine-chatbot.git', // Change to your repo
       path: '/var/www/telemedicine-chatbot',
-      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env production'
+      'pre-deploy-local': 'echo "Starting deployment..."',
+      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env production && pm2 save',
+      'pre-setup': 'mkdir -p /var/www/telemedicine-chatbot/logs'
     }
   }
 };

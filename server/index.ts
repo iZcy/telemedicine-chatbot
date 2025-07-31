@@ -13,6 +13,7 @@ import { whatsappRouter } from "./routes/whatsapp";
 import { knowledgeGapsRouter } from "./routes/knowledge-gaps";
 import { whatsappService } from "./lib/whatsapp-service";
 import { gapEvaluationService } from "./lib/gap-evaluation-service";
+import { disconnectPrisma } from "./lib/prisma";
 
 dotenv.config();
 
@@ -151,7 +152,47 @@ async function initializeServices() {
   }
 }
 
-app.listen(PORT, async () => {
+// Global cleanup function
+async function gracefulShutdown(signal: string): Promise<void> {
+  console.log(`📡 Received ${signal}, starting graceful shutdown...`);
+  
+  try {
+    // Stop gap evaluation service
+    console.log("🛑 Stopping gap evaluation service...");
+    gapEvaluationService.cleanup();
+    
+    // Disconnect WhatsApp service
+    if (process.env.ENABLE_WHATSAPP === "true") {
+      console.log("📱 Disconnecting WhatsApp service...");
+      try {
+        await whatsappService.disconnect();
+      } catch (error) {
+        console.error("Error disconnecting WhatsApp:", error);
+      }
+    }
+    
+    // Close server
+    console.log("🔌 Closing HTTP server...");
+    server.close((err) => {
+      if (err) {
+        console.error("Error closing server:", err);
+        process.exit(1);
+      }
+      console.log("✅ HTTP server closed");
+    });
+    
+    // Disconnect database
+    await disconnectPrisma();
+    
+    console.log("✅ Graceful shutdown completed");
+    process.exit(0);
+  } catch (error) {
+    console.error("❌ Error during graceful shutdown:", error);
+    process.exit(1);
+  }
+}
+
+const server = app.listen(PORT, async () => {
   console.log(`🚀 Server berjalan di port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`🔐 JWT Secret configured: ${!!process.env.JWT_SECRET}`);
@@ -165,4 +206,20 @@ app.listen(PORT, async () => {
 
   // Initialize services after server starts
   await initializeServices();
+});
+
+// Handle graceful shutdown
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGUSR2", () => gracefulShutdown("SIGUSR2")); // PM2 reload signal
+
+// Handle uncaught exceptions
+process.on("uncaughtException", (error) => {
+  console.error("🚨 Uncaught Exception:", error);
+  gracefulShutdown("uncaughtException");
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("🚨 Unhandled Rejection at:", promise, "reason:", reason);
+  gracefulShutdown("unhandledRejection");
 });

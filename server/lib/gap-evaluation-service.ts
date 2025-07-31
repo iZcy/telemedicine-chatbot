@@ -5,6 +5,7 @@ import { ragService } from "./rag-service";
 export class GapEvaluationService {
   private evaluationThreshold = 0.7; // Minimum relevance score to consider a gap resolved
   private batchSize = 10; // Process gaps in batches to avoid overwhelming the system
+  private periodicInterval: NodeJS.Timeout | null = null; // Store interval reference for cleanup
 
   // Auto-evaluate all open gaps against current knowledge base
   async evaluateAllOpenGaps(): Promise<{
@@ -263,11 +264,16 @@ export class GapEvaluationService {
 
   // Schedule periodic gap evaluation
   startPeriodicEvaluation(intervalHours: number = 6): void {
+    // Clear existing interval if any
+    if (this.periodicInterval) {
+      clearInterval(this.periodicInterval);
+    }
+
     const intervalMs = intervalHours * 60 * 60 * 1000;
     
     console.log(`🕒 Starting periodic gap evaluation every ${intervalHours} hours`);
     
-    setInterval(async () => {
+    this.periodicInterval = setInterval(async () => {
       try {
         console.log("🔄 Running scheduled gap evaluation...");
         const result = await this.evaluateAllOpenGaps();
@@ -276,6 +282,21 @@ export class GapEvaluationService {
         console.error("Scheduled gap evaluation error:", error);
       }
     }, intervalMs);
+  }
+
+  // Stop periodic evaluation
+  stopPeriodicEvaluation(): void {
+    if (this.periodicInterval) {
+      clearInterval(this.periodicInterval);
+      this.periodicInterval = null;
+      console.log("🛑 Stopped periodic gap evaluation");
+    }
+  }
+
+  // Cleanup method for proper shutdown
+  cleanup(): void {
+    this.stopPeriodicEvaluation();
+    console.log("🧹 Gap evaluation service cleanup completed");
   }
 
   // Get gap evaluation statistics
