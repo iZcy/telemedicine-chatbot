@@ -5,8 +5,8 @@ module.exports = {
   apps: [
     {
       name: 'telemedicine-chatbot',
-      script: 'tsx',
-      args: 'server/index.ts',
+      script: 'npm',
+      args: 'run server',
       cwd: '/var/www/telemedicine-chatbot',
       instances: 1,
       exec_mode: 'fork',
@@ -20,7 +20,7 @@ module.exports = {
       // Auto-restart settings
       autorestart: true,
       watch: false,
-      max_memory_restart: '2G', // Increased from 1G to handle WhatsApp + AI services
+      max_memory_restart: '1G',
       
       // Logs with rotation
       log_file: './logs/combined.log',
@@ -41,8 +41,7 @@ module.exports = {
       restart_delay: 5000, // Wait 5s between restarts
       
       // Memory and CPU limits
-      max_memory_restart: '2G',
-      node_args: '--enable-source-maps --max-old-space-size=2048',
+      node_args: '--enable-source-maps --max-old-space-size=1024',
       
       // Graceful shutdown
       shutdown_with_message: true,
@@ -87,7 +86,7 @@ module.exports = {
       repo: 'git@github.com:your-username/telemedicine-chatbot.git', // Change to your repo
       path: '/var/www/telemedicine-chatbot',
       'pre-deploy-local': 'echo "Starting deployment..."',
-      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env production && pm2 save',
+      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.cjs --env production && pm2 save',
       'pre-setup': 'mkdir -p /var/www/telemedicine-chatbot/logs'
     }
   }

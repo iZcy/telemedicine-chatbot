@@ -1,0 +1,39 @@
+2025-07-28 00:50:34 +07:00: ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.
+2025-07-28 00:50:34 +07:00:     at Object.xForwardedForHeader (file:///var/www/telemedicine-chatbot/node_modules/express-rate-limit/dist/index.mjs:157:13)
+2025-07-28 00:50:34 +07:00:     at wrappedValidations.<computed> [as xForwardedForHeader] (file:///var/www/telemedicine-chatbot/node_modules/express-rate-limit/dist/index.mjs:369:22)
+2025-07-28 00:50:34 +07:00:     at Object.keyGenerator (file:///var/www/telemedicine-chatbot/node_modules/express-rate-limit/dist/index.mjs:630:20)
+2025-07-28 00:50:34 +07:00:     at file:///var/www/telemedicine-chatbot/node_modules/express-rate-limit/dist/index.mjs:682:32
+2025-07-28 00:50:34 +07:00:     at async file:///var/www/telemedicine-chatbot/node_modules/express-rate-limit/dist/index.mjs:663:5 {
+2025-07-28 00:50:34 +07:00:   code: 'ERR_ERL_UNEXPECTED_X_FORWARDED_FOR',
+2025-07-28 00:50:34 +07:00:   help: 'https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/'
+2025-07-28 00:50:34 +07:00: }
+2025-07-28 00:50:35 +07:00: ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.
+2025-07-28 00:50:35 +07:00:     at Object.xForwardedForHeader (file:///var/www/telemedicine-chatbot/node_modules/express-rate-limit/dist/index.mjs:157:13)
+2025-07-28 00:50:35 +07:00:     at wrappedValidations.<computed> [as xForwardedForHeader] (file:///var/www/telemedicine-chatbot/node_modules/express-rate-limit/dist/index.mjs:369:22)
+2025-07-28 00:50:35 +07:00:     at Object.keyGenerator (file:///var/www/telemedicine-chatbot/node_modules/express-rate-limit/dist/index.mjs:630:20)
+2025-07-28 00:50:35 +07:00:     at file:///var/www/telemedicine-chatbot/node_modules/express-rate-limit/dist/index.mjs:682:32
+2025-07-28 00:50:35 +07:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-07-28 00:50:35 +07:00:     at async file:///var/www/telemedicine-chatbot/node_modules/express-rate-limit/dist/index.mjs:663:5 {
+2025-07-28 00:50:35 +07:00:   code: 'ERR_ERL_UNEXPECTED_X_FORWARDED_FOR',
+2025-07-28 00:50:35 +07:00:   help: 'https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/'
+2025-07-28 00:50:35 +07:00: }
+2025-07-28 00:59:39 +07:00: Failed to parse symptoms JSON: SyntaxError: Unexpected token ` in JSON at position 0
+2025-07-28 00:59:39 +07:00:     at JSON.parse (<anonymous>)
+2025-07-28 00:59:39 +07:00:     at extractSymptoms (/var/www/telemedicine-chatbot/server/lib/openai.ts:98:27)
+2025-07-28 00:59:39 +07:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-07-28 00:59:39 +07:00:     at WhatsAppService.processMessage (/var/www/telemedicine-chatbot/server/lib/whatsapp-service.ts:528:31)
+2025-07-28 00:59:39 +07:00:     at WhatsAppService.handleMessage (/var/www/telemedicine-chatbot/server/lib/whatsapp-service.ts:355:24)
+2025-07-28 00:59:39 +07:00: Raw response: ```json
+2025-07-28 00:59:39 +07:00: ["kanker otak"]
+2025-07-28 00:59:39 +07:00: ```
+2025-07-28 01:01:08 +07:00: ❌ DeepSeek API attempt 1 failed: Request failed with status code 500
+2025-07-28 01:01:08 +07:00: DeepSeek health check failed: Request failed with status code 500
+2025-07-28 12:02:38 +07:00: Failed to parse symptoms JSON: SyntaxError: Unexpected token ` in JSON at position 0
+2025-07-28 12:02:38 +07:00:     at JSON.parse (<anonymous>)
+2025-07-28 12:02:38 +07:00:     at extractSymptoms (/var/www/telemedicine-chatbot/server/lib/openai.ts:98:27)
+2025-07-28 12:02:38 +07:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-07-28 12:02:38 +07:00:     at WhatsAppService.processMessage (/var/www/telemedicine-chatbot/server/lib/whatsapp-service.ts:528:31)
+2025-07-28 12:02:38 +07:00:     at WhatsAppService.handleMessage (/var/www/telemedicine-chatbot/server/lib/whatsapp-service.ts:355:24)
+2025-07-28 12:02:38 +07:00: Raw response: ```json
+2025-07-28 12:02:38 +07:00: []
+2025-07-28 12:02:38 +07:00: ```
