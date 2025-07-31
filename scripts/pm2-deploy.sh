@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 APP_NAME="telemedicine-chatbot"
-PROJECT_PATH="/var/www/telemedicine-chatbot"
+PROJECT_PATH="/home/izcy/Desktop/UGM/KKN/proj/chatbot-telemedicine"
 LOG_PATH="$PROJECT_PATH/logs"
 BACKUP_PATH="$PROJECT_PATH/backups"
 
@@ -70,9 +70,9 @@ install_dependencies() {
     cd "$PROJECT_PATH"
     
     if [ -f "package-lock.json" ]; then
-        npm ci --production
+        npm ci
     else
-        npm install --production
+        npm install
     fi
     
     print_success "Dependencies installed successfully"
@@ -83,10 +83,16 @@ build_application() {
     print_status "Building application..."
     cd "$PROJECT_PATH"
     
+    # Build the client application for production
     if npm run build 2>/dev/null; then
         print_success "Application built successfully"
     else
-        print_warning "Build script not found or failed, continuing with deployment"
+        print_warning "Build script not found, trying vite build directly..."
+        if npx vite build 2>/dev/null; then
+            print_success "Client built with vite directly"
+        else
+            print_warning "Build failed, but continuing with tsx runtime deployment"
+        fi
     fi
 }
 
@@ -129,7 +135,7 @@ start_process() {
     cd "$PROJECT_PATH"
     
     # Start with ecosystem config
-    if pm2 start ecosystem.config.js --env production; then
+    if pm2 start ecosystem.config.cjs --env production; then
         print_success "PM2 process started successfully"
     else
         print_error "Failed to start PM2 process"

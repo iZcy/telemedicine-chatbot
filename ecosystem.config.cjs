@@ -5,8 +5,8 @@ module.exports = {
   apps: [
     {
       name: 'telemedicine-chatbot',
-      script: 'npm',
-      args: 'run server',
+      script: 'tsx',
+      args: 'server/index.ts',
       cwd: '/var/www/telemedicine-chatbot',
       instances: 1,
       exec_mode: 'fork',
@@ -20,7 +20,7 @@ module.exports = {
       // Auto-restart settings
       autorestart: true,
       watch: false,
-      max_memory_restart: '1G',
+      max_memory_restart: '2G', // Increased from 1G to handle WhatsApp + AI services
       
       // Logs with rotation
       log_file: './logs/combined.log',
@@ -41,7 +41,7 @@ module.exports = {
       restart_delay: 5000, // Wait 5s between restarts
       
       // Memory and CPU limits
-      node_args: '--enable-source-maps --max-old-space-size=1024',
+      node_args: '--enable-source-maps --max-old-space-size=2048',
       
       // Graceful shutdown
       shutdown_with_message: true,
@@ -53,6 +53,9 @@ module.exports = {
       // Error handling
       panic: false,
       automation: false,
+      
+      // TypeScript support - skip compilation
+      interpreter: 'none',
       
       // Environment-specific overrides
       env_production: {
