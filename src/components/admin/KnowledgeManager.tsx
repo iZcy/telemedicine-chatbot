@@ -1,5 +1,5 @@
 // src/components/admin/KnowledgeManager.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Search, Lightbulb, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { keywordExtractor } from '@/lib/keyword-extractor';
@@ -50,6 +50,10 @@ export default function KnowledgeManager() {
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
   const [additionalKeywords, setAdditionalKeywords] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [pagination, setPagination] = useState({ page: 1, limit: 25, total: 0, pages: 0 });
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const prevSearchRef = useRef<string>('');
+  const [isSearching, setIsSearching] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -61,23 +65,53 @@ export default function KnowledgeManager() {
 
   useEffect(() => {
     fetchEntries();
-  }, [selectedCategory]);
+  }, [selectedCategory, pagination.page, pagination.limit]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const fetchEntries = async () => {
     try {
       const params = new URLSearchParams();
       if (selectedCategory) params.append('category', selectedCategory);
+      if (searchTerm.trim()) params.append('search', searchTerm.trim());
+      params.append('page', pagination.page.toString());
+      params.append('limit', pagination.limit.toString());
 
-      const response = await fetch(`/api/knowledge?${params}`);
+      const response = await makeAuthenticatedRequest(`/api/knowledge?${params}`);
       const data = await response.json();
 
       if (response.ok) {
         setEntries(data.entries);
+        setPagination(prev => ({
+          ...prev,
+          total: data.pagination.total,
+          pages: data.pagination.pages
+        }));
+      } else {
+        setMessage({ type: 'error', text: 'Failed to load knowledge entries' });
       }
     } catch (error) {
       console.error('Error fetching entries:', error);
+      setMessage({ type: 'error', text: 'Network error loading entries' });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      // Fetch all entries to get unique categories
+      const response = await makeAuthenticatedRequest('/api/knowledge?limit=1000');
+      const data = await response.json();
+      
+      if (response.ok) {
+        const categories = [...new Set(data.entries.map((entry: KnowledgeEntry) => entry.category))];
+        setAvailableCategories(categories.sort());
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
     }
   };
 
@@ -281,10 +315,120 @@ export default function KnowledgeManager() {
     }
   }, [formData.content, formData.category, showForm, editingEntry]);
 
-  const filteredEntries = entries.filter(entry =>
-    entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    entry.content.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Add debounced search functionality
+  useEffect(() => {
+    if (searchTerm !== prevSearchRef.current) {
+      setIsSearching(true);
+    }
+    
+    const timeoutId = setTimeout(() => {
+      if (searchTerm !== prevSearchRef.current) {
+        setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page on search
+        fetchEntries().finally(() => setIsSearching(false));
+        prevSearchRef.current = searchTerm;
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  // Function to render page numbers with smart truncation
+  const renderPageNumbers = () => {
+    const { page, pages } = pagination;
+    const pageNumbers = [];
+    const maxVisiblePages = 7; // Maximum number of page buttons to show
+    
+    if (pages <= maxVisiblePages) {
+      // Show all pages if total pages is small
+      for (let i = 1; i <= pages; i++) {
+        pageNumbers.push(renderPageButton(i));
+      }
+    } else {
+      // Smart pagination with ellipsis
+      if (page <= 4) {
+        // Show first pages + ellipsis + last page
+        for (let i = 1; i <= 5; i++) {
+          pageNumbers.push(renderPageButton(i));
+        }
+        pageNumbers.push(<span key="ellipsis1" className="px-2 py-2 text-gray-500">...</span>);
+        pageNumbers.push(renderPageButton(pages));
+      } else if (page >= pages - 3) {
+        // Show first page + ellipsis + last pages
+        pageNumbers.push(renderPageButton(1));
+        pageNumbers.push(<span key="ellipsis2" className="px-2 py-2 text-gray-500">...</span>);
+        for (let i = pages - 4; i <= pages; i++) {
+          pageNumbers.push(renderPageButton(i));
+        }
+      } else {
+        // Show first page + ellipsis + current pages + ellipsis + last page
+        pageNumbers.push(renderPageButton(1));
+        pageNumbers.push(<span key="ellipsis3" className="px-2 py-2 text-gray-500">...</span>);
+        for (let i = page - 1; i <= page + 1; i++) {
+          pageNumbers.push(renderPageButton(i));
+        }
+        pageNumbers.push(<span key="ellipsis4" className="px-2 py-2 text-gray-500">...</span>);
+        pageNumbers.push(renderPageButton(pages));
+      }
+    }
+    
+    return pageNumbers;
+  };
+
+  // Helper function to render individual page button
+  const renderPageButton = (pageNum: number) => {
+    const isCurrentPage = pageNum === pagination.page;
+    return (
+      <button
+        key={pageNum}
+        onClick={() => setPagination(prev => ({ ...prev, page: pageNum }))}
+        className={`px-3 py-2 text-sm border rounded-lg transition-colors ${
+          isCurrentPage
+            ? 'bg-blue-600 text-white border-blue-600'
+            : 'border-gray-300 hover:bg-gray-50 text-gray-700'
+        }`}
+      >
+        {pageNum}
+      </button>
+    );
+  };
+
+  // Keyboard navigation for pagination
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle pagination keys when not in form inputs
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) {
+        return;
+      }
+
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 'ArrowLeft':
+            e.preventDefault();
+            if (pagination.page > 1) {
+              setPagination(prev => ({ ...prev, page: prev.page - 1 }));
+            }
+            break;
+          case 'ArrowRight':
+            e.preventDefault();
+            if (pagination.page < pagination.pages) {
+              setPagination(prev => ({ ...prev, page: prev.page + 1 }));
+            }
+            break;
+          case 'Home':
+            e.preventDefault();
+            setPagination(prev => ({ ...prev, page: 1 }));
+            break;
+          case 'End':
+            e.preventDefault();
+            setPagination(prev => ({ ...prev, page: prev.pages }));
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [pagination.page, pagination.pages]);
 
   if (isLoading) {
     return <div className="p-4">Loading...</div>;
@@ -333,26 +477,34 @@ export default function KnowledgeManager() {
       {/* Filters */}
       <div className="mb-6 flex space-x-4">
         <div className="flex-1 relative">
-          <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+          <Search className={`h-4 w-4 absolute left-3 top-3 ${isSearching ? 'text-blue-500 animate-pulse' : 'text-gray-400'}`} />
           <input
             type="text"
-            placeholder="Search entries..."
+            placeholder="Search entries by title, content, or keywords..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
           />
+          {isSearching && (
+            <div className="absolute right-3 top-3">
+              <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+            </div>
+          )}
         </div>
         <select
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg"
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+            setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when filter changes
+          }}
+          className="px-4 py-2 border border-gray-300 rounded-lg min-w-fit"
         >
-          <option value="">All Categories</option>
-          <option value="symptoms">Symptoms</option>
-          <option value="conditions">Conditions</option>
-          <option value="treatments">Treatments</option>
-          <option value="general">General Health</option>
-          <option value="emergency">Emergency</option>
+          <option value="">All Categories ({pagination.total} entries)</option>
+          {availableCategories.map(category => (
+            <option key={category} value={category}>
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -385,11 +537,18 @@ export default function KnowledgeManager() {
                   required
                 >
                   <option value="">Select Category</option>
-                  <option value="symptoms">Symptoms</option>
-                  <option value="conditions">Conditions</option>
-                  <option value="treatments">Treatments</option>
-                  <option value="general">General Health</option>
-                  <option value="emergency">Emergency</option>
+                  {availableCategories.map(category => (
+                    <option key={category} value={category}>
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </option>
+                  ))}
+                  {/* Allow creating new categories */}
+                  <option value="gejala">Gejala</option>
+                  <option value="penyakit">Penyakit</option>
+                  <option value="pertolongan_pertama">Pertolongan Pertama</option>
+                  <option value="darurat">Darurat</option>
+                  <option value="mental">Mental Health</option>
+                  <option value="umum">Umum</option>
                 </select>
               </div>
 
@@ -552,50 +711,176 @@ export default function KnowledgeManager() {
       )}
 
       {/* Entries List */}
-      <div className="grid gap-4">
-        {filteredEntries.map((entry) => (
-          <div key={entry.id} className="bg-white border border-gray-200 rounded-lg p-4">
-            <div className="flex justify-between items-start mb-2">
-              <h3 className="text-lg font-semibold">{entry.title}</h3>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => startEdit(entry)}
-                  className="text-blue-600 hover:text-blue-800"
+      <div className="grid gap-4 mb-6">
+        {entries.length > 0 ? (
+          entries.map((entry) => (
+            <div key={entry.id} className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-lg font-semibold">{entry.title}</h3>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => startEdit(entry)}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(entry)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-4 mb-2">
+                <span className="bg-gray-100 px-2 py-1 rounded text-sm">
+                  {entry.category.charAt(0).toUpperCase() + entry.category.slice(1)}
+                </span>
+                {entry.medicalReviewed && (
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+                    ✓ Medical Reviewed
+                  </span>
+                )}
+                <span className="text-xs text-gray-500">
+                  {new Date(entry.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+
+              <p className="text-gray-700 mb-2 line-clamp-3">{entry.content}</p>
+
+              <div className="flex flex-wrap gap-1">
+                {entry.keywords.map((keyword, index) => (
+                  <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                    {keyword}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            {searchTerm || selectedCategory ? 'No entries match your filters' : 'No knowledge entries found'}
+          </div>
+        )}
+      </div>
+
+      {/* Enhanced Pagination */}
+      {pagination.pages > 1 && (
+        <div className="mt-8 space-y-4">
+          {/* Pagination Info and Controls */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="text-sm text-gray-600">
+                Showing {((pagination.page - 1) * pagination.limit) + 1}-{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries
+              </div>
+              
+              {/* Entries per page selector */}
+              <div className="flex items-center space-x-2">
+                <label className="text-sm text-gray-600 whitespace-nowrap">Show:</label>
+                <select
+                  value={pagination.limit}
+                  onChange={(e) => {
+                    const newLimit = parseInt(e.target.value);
+                    setPagination(prev => ({ 
+                      ...prev, 
+                      limit: newLimit, 
+                      page: 1 // Reset to first page when changing limit
+                    }));
+                  }}
+                  className="px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <Edit className="h-4 w-4" />
-                </button>
-                <button 
-                  onClick={() => handleDelete(entry)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span className="text-sm text-gray-600 whitespace-nowrap">entries</span>
               </div>
             </div>
 
-            <div className="flex items-center space-x-4 mb-2">
-              <span className="bg-gray-100 px-2 py-1 rounded text-sm">
-                {entry.category.charAt(0).toUpperCase() + entry.category.slice(1)}
-              </span>
-              {entry.medicalReviewed && (
-                <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
-                  ✓ Medical Reviewed
-                </span>
-              )}
-            </div>
-
-            <p className="text-gray-700 mb-2 line-clamp-3">{entry.content}</p>
-
-            <div className="flex flex-wrap gap-1">
-              {entry.keywords.map((keyword, index) => (
-                <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                  {keyword}
-                </span>
-              ))}
+            {/* Jump to page */}
+            <div className="flex items-center space-x-2">
+              <label className="text-sm text-gray-600 whitespace-nowrap">Go to page:</label>
+              <input
+                type="number"
+                min="1"
+                max={pagination.pages}
+                value={pagination.page}
+                onChange={(e) => {
+                  const page = parseInt(e.target.value);
+                  if (page >= 1 && page <= pagination.pages) {
+                    setPagination(prev => ({ ...prev, page }));
+                  }
+                }}
+                className="w-16 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <span className="text-sm text-gray-600 whitespace-nowrap">of {pagination.pages}</span>
             </div>
           </div>
-        ))}
-      </div>
+
+          {/* Page Navigation */}
+          <div className="flex justify-center">
+            <div className="flex items-center space-x-1 flex-wrap justify-center gap-y-2">
+              {/* First page */}
+              <button
+                onClick={() => setPagination(prev => ({ ...prev, page: 1 }))}
+                disabled={pagination.page === 1}
+                className="px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                title="First page (Ctrl+Home)"
+              >
+                <span className="hidden sm:inline">««</span>
+                <span className="sm:hidden">‹‹</span>
+              </button>
+
+              {/* Previous page */}
+              <button
+                onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                disabled={pagination.page === 1}
+                className="px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                title="Previous page (Ctrl+Left)"
+              >
+                <span className="hidden sm:inline">‹ Previous</span>
+                <span className="sm:hidden">‹</span>
+              </button>
+
+              {/* Page numbers */}
+              <div className="flex items-center space-x-1">
+                {renderPageNumbers()}
+              </div>
+
+              {/* Next page */}
+              <button
+                onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
+                disabled={pagination.page === pagination.pages}
+                className="px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                title="Next page (Ctrl+Right)"
+              >
+                <span className="hidden sm:inline">Next ›</span>
+                <span className="sm:hidden">›</span>
+              </button>
+
+              {/* Last page */}
+              <button
+                onClick={() => setPagination(prev => ({ ...prev, page: prev.pages }))}
+                disabled={pagination.page === pagination.pages}
+                className="px-2 sm:px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                title="Last page (Ctrl+End)"
+              >
+                <span className="hidden sm:inline">»»</span>
+                <span className="sm:hidden">››</span>
+              </button>
+            </div>
+          </div>
+          
+          {/* Keyboard shortcuts help */}
+          <div className="text-center mt-2">
+            <div className="text-xs text-gray-500">
+              💡 Use <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">Ctrl</kbd> + Arrow keys for quick navigation
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

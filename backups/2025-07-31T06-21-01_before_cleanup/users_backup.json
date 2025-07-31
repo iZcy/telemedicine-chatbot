@@ -1,0 +1,11 @@
+[
+  {
+    "id": "cmdlxzcv9000015dey81prc1w",
+    "email": "admin@example.com",
+    "name": "Administrator",
+    "role": "ADMIN",
+    "password": "$2a$10$nqW7veHKElQOCKcqLPvBqOsJ2Xk3Pli3bbJ6vLtNOrUxYZfx2FefS",
+    "createdAt": "2025-07-27T17:17:27.141Z",
+    "updatedAt": "2025-07-27T17:17:27.141Z"
+  }
+]

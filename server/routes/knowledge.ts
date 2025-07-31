@@ -7,12 +7,27 @@ export const knowledgeRouter = Router();
 
 knowledgeRouter.get("/", async (req, res) => {
   try {
-    const { category, page = "1", limit = "10" } = req.query;
+    const { category, search, page = "1", limit = "10" } = req.query;
     const pageNum = parseInt(page as string);
     const limitNum = parseInt(limit as string);
     const skip = (pageNum - 1) * limitNum;
 
-    const where = category ? { category: category as string } : {};
+    let where: any = {};
+    
+    // Add category filter
+    if (category) {
+      where.category = category as string;
+    }
+    
+    // Add search filter
+    if (search && typeof search === 'string' && search.trim()) {
+      const searchTerm = search.trim();
+      where.OR = [
+        { title: { contains: searchTerm, mode: 'insensitive' } },
+        { content: { contains: searchTerm, mode: 'insensitive' } },
+        { keywords: { hasSome: [searchTerm] } }
+      ];
+    }
 
     const [entries, total] = await Promise.all([
       prisma.knowledgeEntry.findMany({

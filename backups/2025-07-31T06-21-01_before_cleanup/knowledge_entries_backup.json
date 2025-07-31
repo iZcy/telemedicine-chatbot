@@ -1,0 +1,1279 @@
+[
+  {
+    "id": "cmdlxzcvv000115dek7j718yj",
+    "title": "Gejala Flu Biasa",
+    "content": "Gejala flu biasa meliputi hidung tersumbat atau berair, sakit tenggorokan, batuk, bersin, dan kelelahan ringan. Gejala biasanya berlangsung 7-10 hari. Istirahat yang cukup, minum banyak cairan, dan obat bebas dapat membantu mengatasi gejala. Konsultasikan dengan dokter jika gejala memburuk atau berlangsung lebih dari 10 hari.",
+    "category": "gejala",
+    "keywords": [
+      "flu",
+      "hidung tersumbat",
+      "sakit tenggorokan",
+      "batuk",
+      "bersin",
+      "pilek"
+    ],
+    "tags": [
+      "pernapasan",
+      "virus"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.163Z",
+    "updatedAt": "2025-07-27T17:17:27.163Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcw1000315det3i1x2xg",
+        "entryId": "cmdlxzcvv000115dek7j718yj",
+        "content": "Gejala flu biasa meliputi hidung tersumbat atau berair, sakit tenggorokan, batuk, bersin, dan kelelahan ringan. Gejala biasanya berlangsung 7-10 hari. Istirahat yang cukup, minum banyak cairan, dan obat bebas dapat membantu mengatasi gejala. Konsultasikan dengan dokter jika gejala memburuk atau berlangsung lebih dari 10 hari.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.169Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcwa000415de1q315cgd",
+    "title": "Penanganan Demam",
+    "content": "Demam adalah suhu tubuh di atas 37,8°C. Untuk demam ringan, disarankan istirahat dan minum banyak cairan. Obat penurun demam seperti paracetamol atau ibuprofen dapat membantu. Segera cari bantuan medis jika demam melebihi 39,4°C, disertai gejala berat, atau berlangsung lebih dari 3 hari.",
+    "category": "gejala",
+    "keywords": [
+      "demam",
+      "suhu tubuh",
+      "demam tinggi",
+      "paracetamol",
+      "ibuprofen",
+      "panas"
+    ],
+    "tags": [
+      "umum",
+      "suhu"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.178Z",
+    "updatedAt": "2025-07-27T17:17:27.178Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcwe000615despoam2kd",
+        "entryId": "cmdlxzcwa000415de1q315cgd",
+        "content": "Demam adalah suhu tubuh di atas 37,8°C. Untuk demam ringan, disarankan istirahat dan minum banyak cairan. Obat penurun demam seperti paracetamol atau ibuprofen dapat membantu. Segera cari bantuan medis jika demam melebihi 39,4°C, disertai gejala berat, atau berlangsung lebih dari 3 hari.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.182Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcwj000715devocdhyav",
+    "title": "Jenis Sakit Kepala dan Kapan Harus Mencari Bantuan",
+    "content": "Sakit kepala dapat berupa sakit kepala tegang, migrain, atau sakit kepala cluster. Sebagian besar sakit kepala jinak dan dapat diatasi dengan istirahat, hidrasi, dan obat pereda nyeri bebas. Segera cari bantuan medis untuk sakit kepala mendadak yang parah, sakit kepala dengan demam dan kaku leher, sakit kepala setelah cedera kepala, atau sakit kepala dengan perubahan penglihatan.",
+    "category": "gejala",
+    "keywords": [
+      "sakit kepala",
+      "migrain",
+      "sakit kepala tegang",
+      "sakit kepala parah"
+    ],
+    "tags": [
+      "neurologi",
+      "nyeri"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.188Z",
+    "updatedAt": "2025-07-27T17:17:27.188Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcwo000915de5rwivkw8",
+        "entryId": "cmdlxzcwj000715devocdhyav",
+        "content": "Sakit kepala dapat berupa sakit kepala tegang, migrain, atau sakit kepala cluster. Sebagian besar sakit kepala jinak dan dapat diatasi dengan istirahat, hidrasi, dan obat pereda nyeri bebas. Segera cari bantuan medis untuk sakit kepala mendadak yang parah, sakit kepala dengan demam dan kaku leher, sakit kepala setelah cedera kepala, atau sakit kepala dengan perubahan penglihatan.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.192Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcws000a15devg9r15h7",
+    "title": "Nyeri Dada - Tanda Bahaya Darurat",
+    "content": "Nyeri dada dapat memiliki berbagai penyebab. SEGERA CARI BANTUAN DARURAT jika nyeri dada disertai dengan: sesak napas, berkeringat, mual, nyeri yang menjalar ke lengan/rahang/punggung, atau perasaan akan pingsan. Ini bisa jadi tanda serangan jantung. Jangan mengemudi sendiri - panggil layanan darurat.",
+    "category": "darurat",
+    "keywords": [
+      "nyeri dada",
+      "serangan jantung",
+      "darurat",
+      "sesak napas",
+      "jantung"
+    ],
+    "tags": [
+      "jantung",
+      "darurat"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": true,
+    "createdAt": "2025-07-27T17:17:27.197Z",
+    "updatedAt": "2025-07-27T17:17:27.197Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcwx000c15dexrlkuom7",
+        "entryId": "cmdlxzcws000a15devg9r15h7",
+        "content": "Nyeri dada dapat memiliki berbagai penyebab. SEGERA CARI BANTUAN DARURAT jika nyeri dada disertai dengan: sesak napas, berkeringat, mual, nyeri yang menjalar ke lengan/rahang/punggung, atau perasaan akan pingsan. Ini bisa jadi tanda serangan jantung. Jangan mengemudi sendiri - panggil layanan darurat.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.202Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcx2000d15deaxmtpjgn",
+    "title": "Dasar-dasar Pola Makan Sehat",
+    "content": "Pola makan sehat meliputi berbagai macam buah, sayuran, biji-bijian utuh, protein tanpa lemak, dan lemak sehat. Targetkan 5-9 porsi buah dan sayuran per hari, batasi makanan olahan, kurangi asupan garam, dan tetap terhidrasi dengan banyak minum air. Konsultasikan dengan ahli gizi untuk saran diet yang dipersonalisasi.",
+    "category": "umum",
+    "keywords": [
+      "diet",
+      "nutrisi",
+      "makan sehat",
+      "buah",
+      "sayuran"
+    ],
+    "tags": [
+      "nutrisi",
+      "pencegahan"
+    ],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.206Z",
+    "updatedAt": "2025-07-27T17:17:27.206Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcx6000f15deoirc95g7",
+        "entryId": "cmdlxzcx2000d15deaxmtpjgn",
+        "content": "Pola makan sehat meliputi berbagai macam buah, sayuran, biji-bijian utuh, protein tanpa lemak, dan lemak sehat. Targetkan 5-9 porsi buah dan sayuran per hari, batasi makanan olahan, kurangi asupan garam, dan tetap terhidrasi dengan banyak minum air. Konsultasikan dengan ahli gizi untuk saran diet yang dipersonalisasi.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.210Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcxb000g15deo18n87az",
+    "title": "Gejala COVID-19 dan Pencegahan",
+    "content": "Gejala COVID-19 meliputi demam, batuk kering, sesak napas, kelelahan, nyeri otot, sakit tenggorokan, dan hilangnya indera penciuman atau perasa. Pencegahan meliputi vaksinasi, memakai masker, menjaga jarak, mencuci tangan, dan menghindari kerumunan. Lakukan tes jika mengalami gejala dan isolasi jika positif.",
+    "category": "penyakit",
+    "keywords": [
+      "covid",
+      "corona",
+      "virus",
+      "vaksin",
+      "masker",
+      "isolasi"
+    ],
+    "tags": [
+      "virus",
+      "pencegahan",
+      "pandemi"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.215Z",
+    "updatedAt": "2025-07-27T17:17:27.215Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcxf000i15de29umnpd7",
+        "entryId": "cmdlxzcxb000g15deo18n87az",
+        "content": "Gejala COVID-19 meliputi demam, batuk kering, sesak napas, kelelahan, nyeri otot, sakit tenggorokan, dan hilangnya indera penciuman atau perasa. Pencegahan meliputi vaksinasi, memakai masker, menjaga jarak, mencuci tangan, dan menghindari kerumunan. Lakukan tes jika mengalami gejala dan isolasi jika positif.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.220Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcxl000j15defcd7kune",
+    "title": "Pertolongan Pertama untuk Luka Bakar",
+    "content": "Untuk luka bakar ringan: segera dinginkan dengan air mengalir selama 10-20 menit, jangan gunakan es, oleskan gel lidah buaya, dan tutup dengan perban steril. Untuk luka bakar berat: jangan lepaskan pakaian yang menempel, segera cari bantuan medis. Hindari mentega, pasta gigi, atau obat rumahan lainnya.",
+    "category": "pertolongan_pertama",
+    "keywords": [
+      "luka bakar",
+      "air dingin",
+      "pertolongan pertama",
+      "bakar"
+    ],
+    "tags": [
+      "darurat",
+      "pertolongan_pertama"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.225Z",
+    "updatedAt": "2025-07-27T17:17:27.225Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcxq000l15de1o5nqeea",
+        "entryId": "cmdlxzcxl000j15defcd7kune",
+        "content": "Untuk luka bakar ringan: segera dinginkan dengan air mengalir selama 10-20 menit, jangan gunakan es, oleskan gel lidah buaya, dan tutup dengan perban steril. Untuk luka bakar berat: jangan lepaskan pakaian yang menempel, segera cari bantuan medis. Hindari mentega, pasta gigi, atau obat rumahan lainnya.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.230Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcxu000m15derc3bns4q",
+    "title": "Mengatasi Diare",
+    "content": "Diare adalah buang air besar cair lebih dari 3 kali sehari. Penanganan meliputi: minum banyak cairan untuk mencegah dehidrasi, konsumsi oralit, makan makanan hambar seperti nasi putih, pisang, roti panggang. Hindari susu, makanan berlemak, dan makanan pedas. Segera ke dokter jika diare berlangsung lebih dari 2 hari, disertai darah, atau tanda dehidrasi berat.",
+    "category": "gejala",
+    "keywords": [
+      "diare",
+      "mencret",
+      "dehidrasi",
+      "oralit",
+      "perut"
+    ],
+    "tags": [
+      "pencernaan",
+      "dehidrasi"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.234Z",
+    "updatedAt": "2025-07-27T17:17:27.234Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcxy000o15dei2j2zjl9",
+        "entryId": "cmdlxzcxu000m15derc3bns4q",
+        "content": "Diare adalah buang air besar cair lebih dari 3 kali sehari. Penanganan meliputi: minum banyak cairan untuk mencegah dehidrasi, konsumsi oralit, makan makanan hambar seperti nasi putih, pisang, roti panggang. Hindari susu, makanan berlemak, dan makanan pedas. Segera ke dokter jika diare berlangsung lebih dari 2 hari, disertai darah, atau tanda dehidrasi berat.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.238Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcyg000p15dey0n1niow",
+    "title": "Cara Mengatasi Insomnia",
+    "content": "Insomnia adalah kesulitan tidur atau mempertahankan tidur. Tips mengatasi: buat jadwal tidur yang teratur, hindari kafein dan alkohol sebelum tidur, ciptakan lingkungan tidur yang nyaman, batasi penggunaan gadget, dan lakukan relaksasi. Jika insomnia berlanjut lebih dari 2 minggu, konsultasikan dengan dokter.",
+    "category": "gejala",
+    "keywords": [
+      "insomnia",
+      "susah tidur",
+      "tidur",
+      "begadang"
+    ],
+    "tags": [
+      "tidur",
+      "mental"
+    ],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.256Z",
+    "updatedAt": "2025-07-27T17:17:27.256Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcyl000r15dewioddvmo",
+        "entryId": "cmdlxzcyg000p15dey0n1niow",
+        "content": "Insomnia adalah kesulitan tidur atau mempertahankan tidur. Tips mengatasi: buat jadwal tidur yang teratur, hindari kafein dan alkohol sebelum tidur, ciptakan lingkungan tidur yang nyaman, batasi penggunaan gadget, dan lakukan relaksasi. Jika insomnia berlanjut lebih dari 2 minggu, konsultasikan dengan dokter.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.261Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcyp000s15dep2qmlecd",
+    "title": "Penanganan Hipertensi",
+    "content": "Hipertensi atau tekanan darah tinggi (>140/90 mmHg) perlu dikelola dengan baik. Penanganan meliputi: diet rendah garam, olahraga teratur, menjaga berat badan ideal, tidak merokok, batasi alkohol, kelola stres, dan minum obat sesuai resep dokter. Kontrol rutin ke dokter untuk monitoring tekanan darah.",
+    "category": "penyakit",
+    "keywords": [
+      "hipertensi",
+      "tekanan darah tinggi",
+      "tensi",
+      "darah tinggi"
+    ],
+    "tags": [
+      "jantung",
+      "kronis"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.266Z",
+    "updatedAt": "2025-07-27T17:17:27.266Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcyt000u15de7z7ccufe",
+        "entryId": "cmdlxzcyp000s15dep2qmlecd",
+        "content": "Hipertensi atau tekanan darah tinggi (>140/90 mmHg) perlu dikelola dengan baik. Penanganan meliputi: diet rendah garam, olahraga teratur, menjaga berat badan ideal, tidak merokok, batasi alkohol, kelola stres, dan minum obat sesuai resep dokter. Kontrol rutin ke dokter untuk monitoring tekanan darah.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.269Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcyy000v15deco7rkhl0",
+    "title": "Gejala dan Penanganan Diabetes",
+    "content": "Gejala diabetes meliputi: sering haus, sering buang air kecil, mudah lapar, penurunan berat badan, kelelahan, dan luka yang sulit sembuh. Penanganan meliputi: diet sehat, olahraga teratur, monitoring gula darah, minum obat sesuai resep, dan kontrol rutin ke dokter. Komplikasi dapat dicegah dengan kontrol gula darah yang baik.",
+    "category": "penyakit",
+    "keywords": [
+      "diabetes",
+      "gula darah",
+      "insulin",
+      "kencing manis"
+    ],
+    "tags": [
+      "metabolik",
+      "kronis"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.274Z",
+    "updatedAt": "2025-07-27T17:17:27.274Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzcz2000x15defznn6eu5",
+        "entryId": "cmdlxzcyy000v15deco7rkhl0",
+        "content": "Gejala diabetes meliputi: sering haus, sering buang air kecil, mudah lapar, penurunan berat badan, kelelahan, dan luka yang sulit sembuh. Penanganan meliputi: diet sehat, olahraga teratur, monitoring gula darah, minum obat sesuai resep, dan kontrol rutin ke dokter. Komplikasi dapat dicegah dengan kontrol gula darah yang baik.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.279Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzcz7000y15dem2rqgc7r",
+    "title": "Pertolongan Pertama Tersedak",
+    "content": "Jika seseorang tersedak dan tidak bisa bicara atau bernapas: berikan 5 pukulan di punggung dengan telapak tangan, lalu lakukan manuver Heimlich (dorong perut ke atas dan ke dalam). Untuk bayi: balikkan tubuh, berikan 5 pukulan di punggung, lalu 5 dorongan dada. Segera panggil bantuan medis jika objek tidak keluar.",
+    "category": "pertolongan_pertama",
+    "keywords": [
+      "tersedak",
+      "heimlich",
+      "pertolongan pertama"
+    ],
+    "tags": [
+      "darurat",
+      "pertolongan_pertama"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": true,
+    "createdAt": "2025-07-27T17:17:27.283Z",
+    "updatedAt": "2025-07-27T17:17:27.283Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzczb001015de14ebf6nl",
+        "entryId": "cmdlxzcz7000y15dem2rqgc7r",
+        "content": "Jika seseorang tersedak dan tidak bisa bicara atau bernapas: berikan 5 pukulan di punggung dengan telapak tangan, lalu lakukan manuver Heimlich (dorong perut ke atas dan ke dalam). Untuk bayi: balikkan tubuh, berikan 5 pukulan di punggung, lalu 5 dorongan dada. Segera panggil bantuan medis jika objek tidak keluar.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.287Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzczf001115dee5cmcw41",
+    "title": "Mengatasi Asma",
+    "content": "Asma adalah kondisi kronis yang menyebabkan sesak napas, mengi, dan batuk. Penanganan meliputi: hindari pemicu (debu, asap, alergen), gunakan inhaler sesuai petunjuk dokter, jaga kebersihan lingkungan, dan buat rencana penanganan asma. Segera ke IGD jika mengalami serangan asma berat atau inhaler tidak membantu.",
+    "category": "penyakit",
+    "keywords": [
+      "asma",
+      "sesak napas",
+      "mengi",
+      "inhaler"
+    ],
+    "tags": [
+      "pernapasan",
+      "kronis"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.291Z",
+    "updatedAt": "2025-07-27T17:17:27.291Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzczj001315dessm0r2qs",
+        "entryId": "cmdlxzczf001115dee5cmcw41",
+        "content": "Asma adalah kondisi kronis yang menyebabkan sesak napas, mengi, dan batuk. Penanganan meliputi: hindari pemicu (debu, asap, alergen), gunakan inhaler sesuai petunjuk dokter, jaga kebersihan lingkungan, dan buat rencana penanganan asma. Segera ke IGD jika mengalami serangan asma berat atau inhaler tidak membantu.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.295Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzczn001415demb8qhkmh",
+    "title": "Pencegahan dan Penanganan Stroke",
+    "content": "Tanda-tanda stroke (FAST): Face (wajah turun), Arms (lengan lemah), Speech (bicara pelo), Time (waktu kritis). Pencegahan: kontrol tekanan darah, kolesterol, gula darah, tidak merokok, olahraga teratur, diet sehat. Jika curiga stroke, segera ke rumah sakit dalam 3 jam pertama untuk hasil optimal.",
+    "category": "darurat",
+    "keywords": [
+      "stroke",
+      "fast",
+      "lumpuh",
+      "bicara pelo"
+    ],
+    "tags": [
+      "neurologi",
+      "darurat"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": true,
+    "createdAt": "2025-07-27T17:17:27.299Z",
+    "updatedAt": "2025-07-27T17:17:27.299Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzczr001615def6eqc2dv",
+        "entryId": "cmdlxzczn001415demb8qhkmh",
+        "content": "Tanda-tanda stroke (FAST): Face (wajah turun), Arms (lengan lemah), Speech (bicara pelo), Time (waktu kritis). Pencegahan: kontrol tekanan darah, kolesterol, gula darah, tidak merokok, olahraga teratur, diet sehat. Jika curiga stroke, segera ke rumah sakit dalam 3 jam pertama untuk hasil optimal.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.303Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlxzczv001715dexcclshld",
+    "title": "Mengatasi Kecemasan dan Stres",
+    "content": "Kecemasan dan stres dapat diatasi dengan: teknik pernapasan dalam, meditasi, olahraga teratur, tidur yang cukup, batasi kafein, berbagi dengan orang terdekat, dan aktivitas yang menenangkan. Jika kecemasan mengganggu aktivitas sehari-hari, konsultasikan dengan psikolog atau psikiater.",
+    "category": "mental",
+    "keywords": [
+      "cemas",
+      "stres",
+      "khawatir",
+      "gelisah",
+      "panik"
+    ],
+    "tags": [
+      "mental",
+      "psikologi"
+    ],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:17:27.307Z",
+    "updatedAt": "2025-07-27T17:17:27.307Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdlxzczz001915de03699g18",
+        "entryId": "cmdlxzczv001715dexcclshld",
+        "content": "Kecemasan dan stres dapat diatasi dengan: teknik pernapasan dalam, meditasi, olahraga teratur, tidur yang cukup, batasi kafein, berbagi dengan orang terdekat, dan aktivitas yang menenangkan. Jika kecemasan mengganggu aktivitas sehari-hari, konsultasikan dengan psikolog atau psikiater.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:17:27.311Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlz8aks0000gk28x16m85va",
+    "title": "Sarana Fasilitas Kesehatan",
+    "content": "### Sarana dan Fasilitas Kesehatan\n- 1 Puskesmas Perawatan, 1 Puskesmas Keliling, 5 Pustu, 5 Poskesdes, 50 Posyandu.\n- Pelayanan gawat darurat level 1 tersedia.\n- Kunjungan rawat jalan: 30.550 jiwa; rawat inap: 780 jiwa.\n- Kunjungan gangguan jiwa: 75 jiwa.\n- Ketersediaan obat dan vaksin esensial: 100%.",
+    "category": "general",
+    "keywords": [
+      "puskesmas",
+      "rawat jalan",
+      "rawat inap",
+      "sarana",
+      "fasilitas"
+    ],
+    "tags": [],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:52:23.689Z",
+    "updatedAt": "2025-07-27T17:52:23.689Z",
+    "createdBy": "admin",
+    "versions": [
+      {
+        "id": "cmdlz8alg0002gk28vm0nbfg1",
+        "entryId": "cmdlz8aks0000gk28x16m85va",
+        "content": "### Sarana dan Fasilitas Kesehatan\n- 1 Puskesmas Perawatan, 1 Puskesmas Keliling, 5 Pustu, 5 Poskesdes, 50 Posyandu.\n- Pelayanan gawat darurat level 1 tersedia.\n- Kunjungan rawat jalan: 30.550 jiwa; rawat inap: 780 jiwa.\n- Kunjungan gangguan jiwa: 75 jiwa.\n- Ketersediaan obat dan vaksin esensial: 100%.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:52:23.716Z",
+        "createdBy": "admin"
+      }
+    ],
+    "queryMatches": [
+      {
+        "id": "cmdlzfsyv0012gk288ziavssf",
+        "sessionId": "wa_6285855174260@c.us_1753639049074",
+        "query": "wilayah puskesmas",
+        "entryId": "cmdlz8aks0000gk28x16m85va",
+        "confidence": 0.6,
+        "wasHelpful": null,
+        "createdAt": "2025-07-27T17:58:14.119Z"
+      }
+    ]
+  },
+  {
+    "id": "cmdlz95hw0003gk28nw2og26m",
+    "title": "Tenaga Kesehatan",
+    "content": "### Tenaga Kesehatan\n- Dokter Umum: 1 (rasio 0.1 per 100.000).\n- Dokter Gigi: 1 (rasio 0.4 per 100.000).\n- Perawat: 21 orang.\n- Bidan: 27 orang.\n- Tenaga Kesehatan Masyarakat: 4 orang.\n- Tenaga Gizi: 6 orang.\n- Tenaga Kesehatan Lingkungan: 1 orang.\n- Tenaga Kefarmasian: 5 orang.",
+    "category": "general",
+    "keywords": [
+      "dokter",
+      "perawat",
+      "bidan",
+      "gigi"
+    ],
+    "tags": [],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:53:03.761Z",
+    "updatedAt": "2025-07-27T17:53:03.761Z",
+    "createdBy": "admin",
+    "versions": [
+      {
+        "id": "cmdlz95ic0005gk28dtnkvdbj",
+        "entryId": "cmdlz95hw0003gk28nw2og26m",
+        "content": "### Tenaga Kesehatan\n- Dokter Umum: 1 (rasio 0.1 per 100.000).\n- Dokter Gigi: 1 (rasio 0.4 per 100.000).\n- Perawat: 21 orang.\n- Bidan: 27 orang.\n- Tenaga Kesehatan Masyarakat: 4 orang.\n- Tenaga Gizi: 6 orang.\n- Tenaga Kesehatan Lingkungan: 1 orang.\n- Tenaga Kefarmasian: 5 orang.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:53:03.780Z",
+        "createdBy": "admin"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlz9pzu0006gk28pb9zp053",
+    "title": "Pembiayaan Kesehatan",
+    "content": "### Pembiayaan Kesehatan\n- Total peserta JKN: 22.477 jiwa dari 27.930 penduduk.\n- Semua desa (5) memanfaatkan dana desa untuk kesehatan.\n- Total anggaran: Rp 3.268.029.721 (DAK & JKN).",
+    "category": "general",
+    "keywords": [
+      "pembiayaan",
+      "kesehatan"
+    ],
+    "tags": [],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:53:30.330Z",
+    "updatedAt": "2025-07-27T17:53:30.330Z",
+    "createdBy": "admin",
+    "versions": [
+      {
+        "id": "cmdlz9q000008gk287wotl9er",
+        "entryId": "cmdlz9pzu0006gk28pb9zp053",
+        "content": "### Pembiayaan Kesehatan\n- Total peserta JKN: 22.477 jiwa dari 27.930 penduduk.\n- Semua desa (5) memanfaatkan dana desa untuk kesehatan.\n- Total anggaran: Rp 3.268.029.721 (DAK & JKN).",
+        "version": 1,
+        "createdAt": "2025-07-27T17:53:30.336Z",
+        "createdBy": "admin"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlzaojk0009gk28p6qqelky",
+    "title": "Kesehatan Keluarga",
+    "content": "### Kesehatan Keluarga\n**Kesehatan Ibu**\n- Tidak ada kematian ibu tahun 2024.\n- Kunjungan K1: 100% (482 dari 505 sasaran).\n- Persalinan oleh nakes: 361 ibu.\n- Imunisasi Td dan TTD tersedia.\n\n**Kesehatan Anak**\n- Angka kematian bayi: 5 kasus.\n- ASI eksklusif: 89,5% (248 bayi).\n- Imunisasi dasar lengkap: 100% di semua desa.\n- Vitamin A: 100% cakupan bayi dan balita.\n- Balita ditimbang: 96,7%.\n\n**Usia Produktif & Lansia**\n- Pelayanan usia produktif: >90%.\n- Pelayanan lansia: 100% dari 2.284 jiwa.",
+    "category": "general",
+    "keywords": [
+      "jiwa",
+      "kesehatan",
+      "keluarga",
+      "kematian",
+      "kesehatan keluarga kesehatan"
+    ],
+    "tags": [],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:54:15.101Z",
+    "updatedAt": "2025-07-27T17:54:15.101Z",
+    "createdBy": "admin",
+    "versions": [
+      {
+        "id": "cmdlzaojs000bgk28ogmz3z0s",
+        "entryId": "cmdlzaojk0009gk28p6qqelky",
+        "content": "### Kesehatan Keluarga\n**Kesehatan Ibu**\n- Tidak ada kematian ibu tahun 2024.\n- Kunjungan K1: 100% (482 dari 505 sasaran).\n- Persalinan oleh nakes: 361 ibu.\n- Imunisasi Td dan TTD tersedia.\n\n**Kesehatan Anak**\n- Angka kematian bayi: 5 kasus.\n- ASI eksklusif: 89,5% (248 bayi).\n- Imunisasi dasar lengkap: 100% di semua desa.\n- Vitamin A: 100% cakupan bayi dan balita.\n- Balita ditimbang: 96,7%.\n\n**Usia Produktif & Lansia**\n- Pelayanan usia produktif: >90%.\n- Pelayanan lansia: 100% dari 2.284 jiwa.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:54:15.112Z",
+        "createdBy": "admin"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlzbq20000cgk281q1rgilz",
+    "title": "Pengendalian Penyakit",
+    "content": "### Pengendalian Penyakit\n**Penyakit Menular**\n- TBC: 27 kasus, 100% ditangani.\n- Pneumonia balita: 76 kasus (43,7% dari 174 estimasi).\n- HIV/AIDS: 0 kasus.\n- Diare balita: 195 kasus ditangani (42,4%).\n\n**Imunisasi**\n- Pertusis: 1 kasus; Hepatitis B: 0; Tetanus Neonatorum: 0; Campak: 0.\n\n**Tidak Menular**\n- Hipertensi: 1.539 kasus.\n- Diabetes Mellitus: 276 kasus (lebih tinggi dari estimasi).\n- Kanker serviks & payudara: 3.375 skrining; IVA positif: 0.\n- Gangguan jiwa berat: 60 jiwa ditangani dari 71.",
+    "category": "general",
+    "keywords": [
+      "imunisasi",
+      "diabetes",
+      "hipertensi",
+      "hepatitis",
+      "menular",
+      "penyakit",
+      "pengendalian",
+      "pneumonia"
+    ],
+    "tags": [],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:55:03.717Z",
+    "updatedAt": "2025-07-27T17:55:03.717Z",
+    "createdBy": "admin",
+    "versions": [
+      {
+        "id": "cmdlzbq29000egk28dohaocdf",
+        "entryId": "cmdlzbq20000cgk281q1rgilz",
+        "content": "### Pengendalian Penyakit\n**Penyakit Menular**\n- TBC: 27 kasus, 100% ditangani.\n- Pneumonia balita: 76 kasus (43,7% dari 174 estimasi).\n- HIV/AIDS: 0 kasus.\n- Diare balita: 195 kasus ditangani (42,4%).\n\n**Imunisasi**\n- Pertusis: 1 kasus; Hepatitis B: 0; Tetanus Neonatorum: 0; Campak: 0.\n\n**Tidak Menular**\n- Hipertensi: 1.539 kasus.\n- Diabetes Mellitus: 276 kasus (lebih tinggi dari estimasi).\n- Kanker serviks & payudara: 3.375 skrining; IVA positif: 0.\n- Gangguan jiwa berat: 60 jiwa ditangani dari 71.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:55:03.729Z",
+        "createdBy": "admin"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlzcbnr000fgk28zk3qwnw4",
+    "title": "Upaya Berbasis Masyarakat",
+    "content": "### Upaya Kesehatan Berbasis Masyarakat\n- Posyandu: 50 unit (0 Mandiri, 29 Madya, 21 Purnama).\n- Rasio Posyandu per 100 balita: 2%.\n- Posbindu PTM: 50 unit tersebar di 5 desa.",
+    "category": "general",
+    "keywords": [
+      "posyandu",
+      "posbindu"
+    ],
+    "tags": [],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:55:31.717Z",
+    "updatedAt": "2025-07-27T17:55:36.461Z",
+    "createdBy": "admin",
+    "versions": [
+      {
+        "id": "cmdlzcbo1000hgk28xc3ajjd5",
+        "entryId": "cmdlzcbnr000fgk28zk3qwnw4",
+        "content": "### Upaya Kesehatan Berbasis Masyarakat\n- Posyandu: 50 unit (0 Mandiri, 29 Madya, 21 Purnama).\n- Rasio Posyandu per 100 balita: 2%.\n- Posbindu PTM: 50 unit tersebar di 5 desa.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:55:31.729Z",
+        "createdBy": "admin"
+      },
+      {
+        "id": "cmdlzcfbr000jgk28qeisv9p9",
+        "entryId": "cmdlzcbnr000fgk28zk3qwnw4",
+        "content": "### Upaya Kesehatan Berbasis Masyarakat\n- Posyandu: 50 unit (0 Mandiri, 29 Madya, 21 Purnama).\n- Rasio Posyandu per 100 balita: 2%.\n- Posbindu PTM: 50 unit tersebar di 5 desa.",
+        "version": 2,
+        "createdAt": "2025-07-27T17:55:36.472Z",
+        "createdBy": "admin"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlzd299000kgk28gb2sujrt",
+    "title": "Kesehatan Lingkungan",
+    "content": "### Kesehatan Lingkungan\n- Sarana air minum memenuhi syarat: 5 dari 5 sampel (100%).\n- Akses sanitasi layak: 100% penduduk.\n- Desa STBM dan STOP BABS: 5 desa (100%).\n- Tempat umum memenuhi syarat kesehatan: 89,7%.\n- Tempat pengolahan makanan sehat: 18,5%.",
+    "category": "general",
+    "keywords": [
+      "umum",
+      "kesehatan",
+      "lingkungan"
+    ],
+    "tags": [],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:56:06.189Z",
+    "updatedAt": "2025-07-27T17:56:06.189Z",
+    "createdBy": "admin",
+    "versions": [
+      {
+        "id": "cmdlzd29g000mgk28yjilsxg7",
+        "entryId": "cmdlzd299000kgk28gb2sujrt",
+        "content": "### Kesehatan Lingkungan\n- Sarana air minum memenuhi syarat: 5 dari 5 sampel (100%).\n- Akses sanitasi layak: 100% penduduk.\n- Desa STBM dan STOP BABS: 5 desa (100%).\n- Tempat umum memenuhi syarat kesehatan: 89,7%.\n- Tempat pengolahan makanan sehat: 18,5%.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:56:06.197Z",
+        "createdBy": "admin"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdlzefnw000ngk28q26fwfr8",
+    "title": "Informasi Umum Wilayah",
+    "content": "### Informasi Umum Wilayah Puskesmas Senaru\n- Wilayah kerja Puskesmas Senaru meliputi 5 desa: Sambik Elen, Loloan, Bayan, Karang Bajo, dan Senaru.\n- Total 55 dusun dan 50 Posyandu.\n- Luas wilayah: 238,18 km².\n- Jumlah penduduk: 27.930 jiwa (13.962 laki-laki, 13.968 perempuan).\n- Data melek huruf dan pendidikan usia >10 tahun belum tersedia.",
+    "category": "general",
+    "keywords": [
+      "umum",
+      "puskesmas"
+    ],
+    "tags": [],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-27T17:57:10.219Z",
+    "updatedAt": "2025-07-27T17:57:10.219Z",
+    "createdBy": "admin",
+    "versions": [
+      {
+        "id": "cmdlzefo1000pgk28mmpcm8nq",
+        "entryId": "cmdlzefnw000ngk28q26fwfr8",
+        "content": "### Informasi Umum Wilayah Puskesmas Senaru\n- Wilayah kerja Puskesmas Senaru meliputi 5 desa: Sambik Elen, Loloan, Bayan, Karang Bajo, dan Senaru.\n- Total 55 dusun dan 50 Posyandu.\n- Luas wilayah: 238,18 km².\n- Jumlah penduduk: 27.930 jiwa (13.962 laki-laki, 13.968 perempuan).\n- Data melek huruf dan pendidikan usia >10 tahun belum tersedia.",
+        "version": 1,
+        "createdAt": "2025-07-27T17:57:10.226Z",
+        "createdBy": "admin"
+      }
+    ],
+    "queryMatches": [
+      {
+        "id": "cmdlzfsym0010gk28m43e2ykw",
+        "sessionId": "wa_6285855174260@c.us_1753639049074",
+        "query": "wilayah puskesmas",
+        "entryId": "cmdlzefnw000ngk28q26fwfr8",
+        "confidence": 0.6,
+        "wasHelpful": null,
+        "createdAt": "2025-07-27T17:58:14.111Z"
+      }
+    ]
+  },
+  {
+    "id": "cmdqzirr80001uux0ceg33g0o",
+    "title": "Gejala Flu Biasa",
+    "content": "Gejala flu biasa meliputi hidung tersumbat atau berair, sakit tenggorokan, batuk, bersin, dan kelelahan ringan. Gejala biasanya berlangsung 7-10 hari. Istirahat yang cukup, minum banyak cairan, dan obat bebas dapat membantu mengatasi gejala. Konsultasikan dengan dokter jika gejala memburuk atau berlangsung lebih dari 10 hari.",
+    "category": "gejala",
+    "keywords": [
+      "flu",
+      "hidung tersumbat",
+      "sakit tenggorokan",
+      "batuk",
+      "bersin",
+      "pilek"
+    ],
+    "tags": [
+      "pernapasan",
+      "virus"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.396Z",
+    "updatedAt": "2025-07-31T05:59:23.396Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirrv0003uux0ohkiu1ka",
+        "entryId": "cmdqzirr80001uux0ceg33g0o",
+        "content": "Gejala flu biasa meliputi hidung tersumbat atau berair, sakit tenggorokan, batuk, bersin, dan kelelahan ringan. Gejala biasanya berlangsung 7-10 hari. Istirahat yang cukup, minum banyak cairan, dan obat bebas dapat membantu mengatasi gejala. Konsultasikan dengan dokter jika gejala memburuk atau berlangsung lebih dari 10 hari.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.420Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirsl0004uux0c95i4tkb",
+    "title": "Penanganan Demam",
+    "content": "Demam adalah suhu tubuh di atas 37,8°C. Untuk demam ringan, disarankan istirahat dan minum banyak cairan. Obat penurun demam seperti paracetamol atau ibuprofen dapat membantu. Segera cari bantuan medis jika demam melebihi 39,4°C, disertai gejala berat, atau berlangsung lebih dari 3 hari.",
+    "category": "gejala",
+    "keywords": [
+      "demam",
+      "suhu tubuh",
+      "demam tinggi",
+      "paracetamol",
+      "ibuprofen",
+      "panas"
+    ],
+    "tags": [
+      "umum",
+      "suhu"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.445Z",
+    "updatedAt": "2025-07-31T05:59:23.445Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirsq0006uux07dhckoco",
+        "entryId": "cmdqzirsl0004uux0c95i4tkb",
+        "content": "Demam adalah suhu tubuh di atas 37,8°C. Untuk demam ringan, disarankan istirahat dan minum banyak cairan. Obat penurun demam seperti paracetamol atau ibuprofen dapat membantu. Segera cari bantuan medis jika demam melebihi 39,4°C, disertai gejala berat, atau berlangsung lebih dari 3 hari.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.450Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirsv0007uux01ntl03ie",
+    "title": "Jenis Sakit Kepala dan Kapan Harus Mencari Bantuan",
+    "content": "Sakit kepala dapat berupa sakit kepala tegang, migrain, atau sakit kepala cluster. Sebagian besar sakit kepala jinak dan dapat diatasi dengan istirahat, hidrasi, dan obat pereda nyeri bebas. Segera cari bantuan medis untuk sakit kepala mendadak yang parah, sakit kepala dengan demam dan kaku leher, sakit kepala setelah cedera kepala, atau sakit kepala dengan perubahan penglihatan.",
+    "category": "gejala",
+    "keywords": [
+      "sakit kepala",
+      "migrain",
+      "sakit kepala tegang",
+      "sakit kepala parah"
+    ],
+    "tags": [
+      "neurologi",
+      "nyeri"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.456Z",
+    "updatedAt": "2025-07-31T05:59:23.456Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirt20009uux0i8id7kyf",
+        "entryId": "cmdqzirsv0007uux01ntl03ie",
+        "content": "Sakit kepala dapat berupa sakit kepala tegang, migrain, atau sakit kepala cluster. Sebagian besar sakit kepala jinak dan dapat diatasi dengan istirahat, hidrasi, dan obat pereda nyeri bebas. Segera cari bantuan medis untuk sakit kepala mendadak yang parah, sakit kepala dengan demam dan kaku leher, sakit kepala setelah cedera kepala, atau sakit kepala dengan perubahan penglihatan.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.463Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirt8000auux0aybhw8se",
+    "title": "Nyeri Dada - Tanda Bahaya Darurat",
+    "content": "Nyeri dada dapat memiliki berbagai penyebab. SEGERA CARI BANTUAN DARURAT jika nyeri dada disertai dengan: sesak napas, berkeringat, mual, nyeri yang menjalar ke lengan/rahang/punggung, atau perasaan akan pingsan. Ini bisa jadi tanda serangan jantung. Jangan mengemudi sendiri - panggil layanan darurat.",
+    "category": "darurat",
+    "keywords": [
+      "nyeri dada",
+      "serangan jantung",
+      "darurat",
+      "sesak napas",
+      "jantung"
+    ],
+    "tags": [
+      "jantung",
+      "darurat"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": true,
+    "createdAt": "2025-07-31T05:59:23.468Z",
+    "updatedAt": "2025-07-31T05:59:23.468Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirte000cuux04pmb2zg2",
+        "entryId": "cmdqzirt8000auux0aybhw8se",
+        "content": "Nyeri dada dapat memiliki berbagai penyebab. SEGERA CARI BANTUAN DARURAT jika nyeri dada disertai dengan: sesak napas, berkeringat, mual, nyeri yang menjalar ke lengan/rahang/punggung, atau perasaan akan pingsan. Ini bisa jadi tanda serangan jantung. Jangan mengemudi sendiri - panggil layanan darurat.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.474Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirtj000duux0t3kd2lnh",
+    "title": "Dasar-dasar Pola Makan Sehat",
+    "content": "Pola makan sehat meliputi berbagai macam buah, sayuran, biji-bijian utuh, protein tanpa lemak, dan lemak sehat. Targetkan 5-9 porsi buah dan sayuran per hari, batasi makanan olahan, kurangi asupan garam, dan tetap terhidrasi dengan banyak minum air. Konsultasikan dengan ahli gizi untuk saran diet yang dipersonalisasi.",
+    "category": "umum",
+    "keywords": [
+      "diet",
+      "nutrisi",
+      "makan sehat",
+      "buah",
+      "sayuran"
+    ],
+    "tags": [
+      "nutrisi",
+      "pencegahan"
+    ],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.480Z",
+    "updatedAt": "2025-07-31T05:59:23.480Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirtr000fuux0y9p949ok",
+        "entryId": "cmdqzirtj000duux0t3kd2lnh",
+        "content": "Pola makan sehat meliputi berbagai macam buah, sayuran, biji-bijian utuh, protein tanpa lemak, dan lemak sehat. Targetkan 5-9 porsi buah dan sayuran per hari, batasi makanan olahan, kurangi asupan garam, dan tetap terhidrasi dengan banyak minum air. Konsultasikan dengan ahli gizi untuk saran diet yang dipersonalisasi.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.487Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirtw000guux0jhaovd86",
+    "title": "Gejala COVID-19 dan Pencegahan",
+    "content": "Gejala COVID-19 meliputi demam, batuk kering, sesak napas, kelelahan, nyeri otot, sakit tenggorokan, dan hilangnya indera penciuman atau perasa. Pencegahan meliputi vaksinasi, memakai masker, menjaga jarak, mencuci tangan, dan menghindari kerumunan. Lakukan tes jika mengalami gejala dan isolasi jika positif.",
+    "category": "penyakit",
+    "keywords": [
+      "covid",
+      "corona",
+      "virus",
+      "vaksin",
+      "masker",
+      "isolasi"
+    ],
+    "tags": [
+      "virus",
+      "pencegahan",
+      "pandemi"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.492Z",
+    "updatedAt": "2025-07-31T05:59:23.492Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqziru1000iuux0z50o1tf8",
+        "entryId": "cmdqzirtw000guux0jhaovd86",
+        "content": "Gejala COVID-19 meliputi demam, batuk kering, sesak napas, kelelahan, nyeri otot, sakit tenggorokan, dan hilangnya indera penciuman atau perasa. Pencegahan meliputi vaksinasi, memakai masker, menjaga jarak, mencuci tangan, dan menghindari kerumunan. Lakukan tes jika mengalami gejala dan isolasi jika positif.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.497Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqziru5000juux0zamb5xn5",
+    "title": "Pertolongan Pertama untuk Luka Bakar",
+    "content": "Untuk luka bakar ringan: segera dinginkan dengan air mengalir selama 10-20 menit, jangan gunakan es, oleskan gel lidah buaya, dan tutup dengan perban steril. Untuk luka bakar berat: jangan lepaskan pakaian yang menempel, segera cari bantuan medis. Hindari mentega, pasta gigi, atau obat rumahan lainnya.",
+    "category": "pertolongan_pertama",
+    "keywords": [
+      "luka bakar",
+      "air dingin",
+      "pertolongan pertama",
+      "bakar"
+    ],
+    "tags": [
+      "darurat",
+      "pertolongan_pertama"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.502Z",
+    "updatedAt": "2025-07-31T05:59:23.502Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirua000luux0c8z3uunx",
+        "entryId": "cmdqziru5000juux0zamb5xn5",
+        "content": "Untuk luka bakar ringan: segera dinginkan dengan air mengalir selama 10-20 menit, jangan gunakan es, oleskan gel lidah buaya, dan tutup dengan perban steril. Untuk luka bakar berat: jangan lepaskan pakaian yang menempel, segera cari bantuan medis. Hindari mentega, pasta gigi, atau obat rumahan lainnya.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.507Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqziruf000muux0z161zefg",
+    "title": "Mengatasi Diare",
+    "content": "Diare adalah buang air besar cair lebih dari 3 kali sehari. Penanganan meliputi: minum banyak cairan untuk mencegah dehidrasi, konsumsi oralit, makan makanan hambar seperti nasi putih, pisang, roti panggang. Hindari susu, makanan berlemak, dan makanan pedas. Segera ke dokter jika diare berlangsung lebih dari 2 hari, disertai darah, atau tanda dehidrasi berat.",
+    "category": "gejala",
+    "keywords": [
+      "diare",
+      "mencret",
+      "dehidrasi",
+      "oralit",
+      "perut"
+    ],
+    "tags": [
+      "pencernaan",
+      "dehidrasi"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.511Z",
+    "updatedAt": "2025-07-31T05:59:23.511Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqziruj000ouux0b2r8q928",
+        "entryId": "cmdqziruf000muux0z161zefg",
+        "content": "Diare adalah buang air besar cair lebih dari 3 kali sehari. Penanganan meliputi: minum banyak cairan untuk mencegah dehidrasi, konsumsi oralit, makan makanan hambar seperti nasi putih, pisang, roti panggang. Hindari susu, makanan berlemak, dan makanan pedas. Segera ke dokter jika diare berlangsung lebih dari 2 hari, disertai darah, atau tanda dehidrasi berat.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.516Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqziruo000puux0jg5dxuhp",
+    "title": "Cara Mengatasi Insomnia",
+    "content": "Insomnia adalah kesulitan tidur atau mempertahankan tidur. Tips mengatasi: buat jadwal tidur yang teratur, hindari kafein dan alkohol sebelum tidur, ciptakan lingkungan tidur yang nyaman, batasi penggunaan gadget, dan lakukan relaksasi. Jika insomnia berlanjut lebih dari 2 minggu, konsultasikan dengan dokter.",
+    "category": "gejala",
+    "keywords": [
+      "insomnia",
+      "susah tidur",
+      "tidur",
+      "begadang"
+    ],
+    "tags": [
+      "tidur",
+      "mental"
+    ],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.520Z",
+    "updatedAt": "2025-07-31T05:59:23.520Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirut000ruux02kqqzehc",
+        "entryId": "cmdqziruo000puux0jg5dxuhp",
+        "content": "Insomnia adalah kesulitan tidur atau mempertahankan tidur. Tips mengatasi: buat jadwal tidur yang teratur, hindari kafein dan alkohol sebelum tidur, ciptakan lingkungan tidur yang nyaman, batasi penggunaan gadget, dan lakukan relaksasi. Jika insomnia berlanjut lebih dari 2 minggu, konsultasikan dengan dokter.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.525Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirv1000suux0gegt1xog",
+    "title": "Penanganan Hipertensi",
+    "content": "Hipertensi atau tekanan darah tinggi (>140/90 mmHg) perlu dikelola dengan baik. Penanganan meliputi: diet rendah garam, olahraga teratur, menjaga berat badan ideal, tidak merokok, batasi alkohol, kelola stres, dan minum obat sesuai resep dokter. Kontrol rutin ke dokter untuk monitoring tekanan darah.",
+    "category": "penyakit",
+    "keywords": [
+      "hipertensi",
+      "tekanan darah tinggi",
+      "tensi",
+      "darah tinggi"
+    ],
+    "tags": [
+      "jantung",
+      "kronis"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.533Z",
+    "updatedAt": "2025-07-31T05:59:23.533Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirv6000uuux0hdnhpwmd",
+        "entryId": "cmdqzirv1000suux0gegt1xog",
+        "content": "Hipertensi atau tekanan darah tinggi (>140/90 mmHg) perlu dikelola dengan baik. Penanganan meliputi: diet rendah garam, olahraga teratur, menjaga berat badan ideal, tidak merokok, batasi alkohol, kelola stres, dan minum obat sesuai resep dokter. Kontrol rutin ke dokter untuk monitoring tekanan darah.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.538Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirva000vuux0fx1apmqe",
+    "title": "Gejala dan Penanganan Diabetes",
+    "content": "Gejala diabetes meliputi: sering haus, sering buang air kecil, mudah lapar, penurunan berat badan, kelelahan, dan luka yang sulit sembuh. Penanganan meliputi: diet sehat, olahraga teratur, monitoring gula darah, minum obat sesuai resep, dan kontrol rutin ke dokter. Komplikasi dapat dicegah dengan kontrol gula darah yang baik.",
+    "category": "penyakit",
+    "keywords": [
+      "diabetes",
+      "gula darah",
+      "insulin",
+      "kencing manis"
+    ],
+    "tags": [
+      "metabolik",
+      "kronis"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.542Z",
+    "updatedAt": "2025-07-31T05:59:23.542Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirvd000xuux04qwvy89h",
+        "entryId": "cmdqzirva000vuux0fx1apmqe",
+        "content": "Gejala diabetes meliputi: sering haus, sering buang air kecil, mudah lapar, penurunan berat badan, kelelahan, dan luka yang sulit sembuh. Penanganan meliputi: diet sehat, olahraga teratur, monitoring gula darah, minum obat sesuai resep, dan kontrol rutin ke dokter. Komplikasi dapat dicegah dengan kontrol gula darah yang baik.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.546Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirvh000yuux0grh17epr",
+    "title": "Pertolongan Pertama Tersedak",
+    "content": "Jika seseorang tersedak dan tidak bisa bicara atau bernapas: berikan 5 pukulan di punggung dengan telapak tangan, lalu lakukan manuver Heimlich (dorong perut ke atas dan ke dalam). Untuk bayi: balikkan tubuh, berikan 5 pukulan di punggung, lalu 5 dorongan dada. Segera panggil bantuan medis jika objek tidak keluar.",
+    "category": "pertolongan_pertama",
+    "keywords": [
+      "tersedak",
+      "heimlich",
+      "pertolongan pertama"
+    ],
+    "tags": [
+      "darurat",
+      "pertolongan_pertama"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": true,
+    "createdAt": "2025-07-31T05:59:23.550Z",
+    "updatedAt": "2025-07-31T05:59:23.550Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirwb0010uux0nwzbyyt7",
+        "entryId": "cmdqzirvh000yuux0grh17epr",
+        "content": "Jika seseorang tersedak dan tidak bisa bicara atau bernapas: berikan 5 pukulan di punggung dengan telapak tangan, lalu lakukan manuver Heimlich (dorong perut ke atas dan ke dalam). Untuk bayi: balikkan tubuh, berikan 5 pukulan di punggung, lalu 5 dorongan dada. Segera panggil bantuan medis jika objek tidak keluar.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.579Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirwo0011uux0fvpzmrm8",
+    "title": "Mengatasi Asma",
+    "content": "Asma adalah kondisi kronis yang menyebabkan sesak napas, mengi, dan batuk. Penanganan meliputi: hindari pemicu (debu, asap, alergen), gunakan inhaler sesuai petunjuk dokter, jaga kebersihan lingkungan, dan buat rencana penanganan asma. Segera ke IGD jika mengalami serangan asma berat atau inhaler tidak membantu.",
+    "category": "penyakit",
+    "keywords": [
+      "asma",
+      "sesak napas",
+      "mengi",
+      "inhaler"
+    ],
+    "tags": [
+      "pernapasan",
+      "kronis"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.592Z",
+    "updatedAt": "2025-07-31T05:59:23.592Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirws0013uux0541ux4qo",
+        "entryId": "cmdqzirwo0011uux0fvpzmrm8",
+        "content": "Asma adalah kondisi kronis yang menyebabkan sesak napas, mengi, dan batuk. Penanganan meliputi: hindari pemicu (debu, asap, alergen), gunakan inhaler sesuai petunjuk dokter, jaga kebersihan lingkungan, dan buat rencana penanganan asma. Segera ke IGD jika mengalami serangan asma berat atau inhaler tidak membantu.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.597Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirwy0014uux02uwtihyp",
+    "title": "Pencegahan dan Penanganan Stroke",
+    "content": "Tanda-tanda stroke (FAST): Face (wajah turun), Arms (lengan lemah), Speech (bicara pelo), Time (waktu kritis). Pencegahan: kontrol tekanan darah, kolesterol, gula darah, tidak merokok, olahraga teratur, diet sehat. Jika curiga stroke, segera ke rumah sakit dalam 3 jam pertama untuk hasil optimal.",
+    "category": "darurat",
+    "keywords": [
+      "stroke",
+      "fast",
+      "lumpuh",
+      "bicara pelo"
+    ],
+    "tags": [
+      "neurologi",
+      "darurat"
+    ],
+    "confidenceLevel": "HIGH",
+    "medicalReviewed": true,
+    "requiresEscalation": true,
+    "createdAt": "2025-07-31T05:59:23.602Z",
+    "updatedAt": "2025-07-31T05:59:23.602Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirx20016uux0kwb1htka",
+        "entryId": "cmdqzirwy0014uux02uwtihyp",
+        "content": "Tanda-tanda stroke (FAST): Face (wajah turun), Arms (lengan lemah), Speech (bicara pelo), Time (waktu kritis). Pencegahan: kontrol tekanan darah, kolesterol, gula darah, tidak merokok, olahraga teratur, diet sehat. Jika curiga stroke, segera ke rumah sakit dalam 3 jam pertama untuk hasil optimal.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.606Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  },
+  {
+    "id": "cmdqzirx60017uux0mwflmul3",
+    "title": "Mengatasi Kecemasan dan Stres",
+    "content": "Kecemasan dan stres dapat diatasi dengan: teknik pernapasan dalam, meditasi, olahraga teratur, tidur yang cukup, batasi kafein, berbagi dengan orang terdekat, dan aktivitas yang menenangkan. Jika kecemasan mengganggu aktivitas sehari-hari, konsultasikan dengan psikolog atau psikiater.",
+    "category": "mental",
+    "keywords": [
+      "cemas",
+      "stres",
+      "khawatir",
+      "gelisah",
+      "panik"
+    ],
+    "tags": [
+      "mental",
+      "psikologi"
+    ],
+    "confidenceLevel": "MEDIUM",
+    "medicalReviewed": true,
+    "requiresEscalation": false,
+    "createdAt": "2025-07-31T05:59:23.610Z",
+    "updatedAt": "2025-07-31T05:59:23.610Z",
+    "createdBy": "cmdlxzcv9000015dey81prc1w",
+    "versions": [
+      {
+        "id": "cmdqzirx90019uux03ismyw3w",
+        "entryId": "cmdqzirx60017uux0mwflmul3",
+        "content": "Kecemasan dan stres dapat diatasi dengan: teknik pernapasan dalam, meditasi, olahraga teratur, tidur yang cukup, batasi kafein, berbagi dengan orang terdekat, dan aktivitas yang menenangkan. Jika kecemasan mengganggu aktivitas sehari-hari, konsultasikan dengan psikolog atau psikiater.",
+        "version": 1,
+        "createdAt": "2025-07-31T05:59:23.614Z",
+        "createdBy": "cmdlxzcv9000015dey81prc1w"
+      }
+    ],
+    "queryMatches": []
+  }
+]
