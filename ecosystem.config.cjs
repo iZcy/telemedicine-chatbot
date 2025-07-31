@@ -55,6 +55,9 @@ module.exports = {
       panic: false,
       automation: false,
       
+      // TypeScript support - skip compilation
+      interpreter: 'none',
+      
       // Environment-specific overrides
       env_production: {
         NODE_ENV: 'production',

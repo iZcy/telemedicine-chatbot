@@ -80,13 +80,19 @@ install_dependencies() {
 
 # Build the application
 build_application() {
-    print_status "Building application..."
+    print_status "Skipping TypeScript compilation - using tsx runtime..."
     cd "$PROJECT_PATH"
     
-    if npm run build 2>/dev/null; then
-        print_success "Application built successfully"
+    # Just build the client application for production
+    if npm run build:client 2>/dev/null; then
+        print_success "Client application built successfully"
     else
-        print_warning "Build script not found or failed, continuing with deployment"
+        print_warning "Client build script not found, checking for vite build..."
+        if npx vite build 2>/dev/null; then
+            print_success "Client built with vite directly"
+        else
+            print_warning "Client build failed, continuing with server-only deployment"
+        fi
     fi
 }
 
