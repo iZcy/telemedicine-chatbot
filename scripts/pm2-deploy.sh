@@ -129,7 +129,7 @@ start_process() {
     cd "$PROJECT_PATH"
     
     # Start with ecosystem config
-    if pm2 start ecosystem.config.js --env production; then
+    if pm2 start ecosystem.config.cjs --env production; then
         print_success "PM2 process started successfully"
     else
         print_error "Failed to start PM2 process"

@@ -87,7 +87,7 @@ module.exports = {
       repo: 'git@github.com:your-username/telemedicine-chatbot.git', // Change to your repo
       path: '/var/www/telemedicine-chatbot',
       'pre-deploy-local': 'echo "Starting deployment..."',
-      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env production && pm2 save',
+      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.cjs --env production && pm2 save',
       'pre-setup': 'mkdir -p /var/www/telemedicine-chatbot/logs'
     }
   }

@@ -20,7 +20,7 @@
     "reset:pm2": "./scripts/reset-pm2.sh",
     "backup:database": "./scripts/backup-database.sh",
     "reset:docker": "./scripts/docker-reset.sh",
-    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
     "pm2:stop": "pm2 stop telemedicine-chatbot",
     "pm2:restart": "pm2 restart telemedicine-chatbot",
     "pm2:logs": "pm2 logs telemedicine-chatbot",
