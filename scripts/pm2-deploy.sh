@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 APP_NAME="telemedicine-chatbot"
-PROJECT_PATH="/var/www/telemedicine-chatbot"
+PROJECT_PATH="/home/izcy/Desktop/UGM/KKN/proj/chatbot-telemedicine"
 LOG_PATH="$PROJECT_PATH/logs"
 BACKUP_PATH="$PROJECT_PATH/backups"
 
