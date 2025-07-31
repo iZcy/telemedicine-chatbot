@@ -70,9 +70,9 @@ install_dependencies() {
     cd "$PROJECT_PATH"
     
     if [ -f "package-lock.json" ]; then
-        npm ci --production
+        npm ci
     else
-        npm install --production
+        npm install
     fi
     
     print_success "Dependencies installed successfully"
@@ -80,18 +80,18 @@ install_dependencies() {
 
 # Build the application
 build_application() {
-    print_status "Skipping TypeScript compilation - using tsx runtime..."
+    print_status "Building application..."
     cd "$PROJECT_PATH"
     
-    # Just build the client application for production
-    if npm run build:client 2>/dev/null; then
-        print_success "Client application built successfully"
+    # Build the client application for production
+    if npm run build 2>/dev/null; then
+        print_success "Application built successfully"
     else
-        print_warning "Client build script not found, checking for vite build..."
+        print_warning "Build script not found, trying vite build directly..."
         if npx vite build 2>/dev/null; then
             print_success "Client built with vite directly"
         else
-            print_warning "Client build failed, continuing with server-only deployment"
+            print_warning "Build failed, but continuing with tsx runtime deployment"
         fi
     fi
 }
