@@ -37,26 +37,31 @@ export class WhatsAppService {
       }),
       puppeteer: {
         headless: true,
+        executablePath: "/usr/bin/google-chrome",
         args: [
           "--no-sandbox",
           "--disable-setuid-sandbox",
           "--disable-dev-shm-usage",
-          "--disable-accelerated-2d-canvas",
-          "--no-first-run",
-          "--no-zygote",
           "--disable-gpu",
           "--disable-extensions",
-          "--disable-background-timer-throttling",
-          "--disable-backgrounding-occluded-windows",
-          "--disable-renderer-backgrounding",
-          "--disable-features=VizDisplayCompositor",
-          "--disable-ipc-flooding-protection"
+          "--no-first-run",
+          "--disable-default-apps",
+          "--disable-translate",
+          "--disable-plugins",
+          "--disable-background-networking",
+          "--disable-sync",
+          "--disable-logging",
+          "--disable-web-security",
+          "--hide-scrollbars",
+          "--mute-audio"
         ],
-        timeout: 60000 // Increase timeout
+        timeout: 60000
       },
-      // Add session save frequency to prevent session corruption
+      // Prevent session conflicts
       takeoverOnConflict: false,
-      takeoverTimeoutMs: 0
+      takeoverTimeoutMs: 0,
+      // Disable user agent override to prevent session closing
+      userAgent: undefined
     });
 
     this.setupEventListeners();
@@ -171,7 +176,16 @@ export class WhatsAppService {
 
       // Try to restart the client
       if (this.client) {
-        await this.client.destroy();
+        try {
+          if (this.client.pupPage && !this.client.pupPage.isClosed()) {
+            await this.client.destroy();
+          } else if (this.client.pupBrowser) {
+            await this.client.pupBrowser.close();
+          }
+        } catch (destroyError) {
+          console.log("Client cleanup during recovery:", destroyError.message);
+        }
+        this.client = null;
       }
 
       // Wait a bit before reinitializing
@@ -310,19 +324,44 @@ export class WhatsAppService {
       this.isInitializing = true;
       this.connectionState = "CONNECTING";
       this.lastError = null;
+      this.reconnectAttempts = 0;
       this.addToLog("Initializing WhatsApp service...");
 
-      await this.client.initialize();
-      this.addToLog("WhatsApp service initialized");
+      // Set a timeout for the initialization process
+      const initPromise = this.client.initialize();
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Initialization timeout after 3 minutes")), 180000);
+      });
+
+      await Promise.race([initPromise, timeoutPromise]);
+      this.addToLog("WhatsApp service initialized successfully");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      console.error("Failed to initialize WhatsApp service:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("❌ Failed to initialize WhatsApp service:", error);
+      
       this.connectionState = "ERROR";
       this.lastError = errorMessage;
       this.isInitializing = false;
-      this.addToLog(`Initialization failed: ${errorMessage}`);
+      this.addToLog(`❌ Initialization failed: ${errorMessage}`);
+      
+      // Clean up any partial initialization
+      try {
+        if (this.client) {
+          if (this.client.pupPage && !this.client.pupPage.isClosed()) {
+            await this.client.destroy();
+          } else if (this.client.pupBrowser) {
+            await this.client.pupBrowser.close();
+          }
+          this.client = null;
+        }
+      } catch (cleanupError) {
+        console.error("Error during cleanup:", cleanupError);
+      }
+      
+      // Reinitialize client for next attempt
+      this.initializeClient();
       this.clearAllSessions();
+      
       throw error;
     }
   }
@@ -740,7 +779,17 @@ Ketik /bantuan untuk melihat perintah yang tersedia.`;
       this.clearAllSessions();
 
       if (this.client) {
-        await this.client.destroy();
+        try {
+          // Check if client has active page/browser before destroying
+          if (this.client.pupPage && !this.client.pupPage.isClosed()) {
+            await this.client.destroy();
+          } else if (this.client.pupBrowser) {
+            await this.client.pupBrowser.close();
+          }
+        } catch (destroyError) {
+          console.log("Client already destroyed or null:", destroyError.message);
+        }
+        this.client = null;
       }
 
       await this.clearWhatsAppAuth();

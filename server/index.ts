@@ -20,6 +20,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy settings (required when behind reverse proxy like nginx)
+app.set('trust proxy', true);
+
 // Security middleware
 app.use(helmet());
 app.use(
